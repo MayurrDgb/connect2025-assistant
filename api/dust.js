@@ -19,10 +19,13 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Message requis' });
         }
         
+        console.log('🔍 ConversationId reçu:', conversationId);
+        
         let dustUrl, dustPayload;
         
-        if (conversationId) {
+        if (conversationId && conversationId !== null && conversationId !== 'null') {
             // Continuer une conversation existante
+            console.log('📝 Continuation de conversation:', conversationId);
             dustUrl = `https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations/${conversationId}/messages`;
             dustPayload = {
                 content: message,
@@ -41,6 +44,7 @@ export default async function handler(req, res) {
             };
         } else {
             // Nouvelle conversation
+            console.log('🆕 Nouvelle conversation');
             dustUrl = 'https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations';
             dustPayload = {
                 message: {
@@ -63,6 +67,7 @@ export default async function handler(req, res) {
         }
         
         console.log('📤 Envoi à Dust:', JSON.stringify(dustPayload, null, 2));
+        console.log('🌐 URL:', dustUrl);
         
         const dustResponse = await fetch(dustUrl, {
             method: 'POST',
@@ -80,7 +85,7 @@ export default async function handler(req, res) {
         }
         
         const data = await dustResponse.json();
-        console.log('📥 Réponse Dust:', data);
+        console.log('📥 Réponse Dust:', JSON.stringify(data, null, 2));
         
         // Extraction de la réponse
         let assistantResponse = "Je traite votre demande...";
@@ -99,6 +104,9 @@ export default async function handler(req, res) {
             // Format pour message dans conversation existante
             assistantResponse = data.content.trim();
         }
+        
+        console.log('✅ Réponse extraite:', assistantResponse);
+        console.log('🆔 ConversationId final:', newConversationId);
         
         return res.status(200).json({ 
             response: assistantResponse,
