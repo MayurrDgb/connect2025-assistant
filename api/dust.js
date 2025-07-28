@@ -19,37 +19,36 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Message requis' });
         }
         
-        // Format correct pour l'API Dust
+        // Format simplifié pour Dust
+        const dustPayload = {
+            message: {
+                content: message,
+                mentions: [{
+                    configurationId: 'Xl8LLukA05'
+                }]
+            },
+            blocking: true
+        };
+        
+        console.log('Payload envoyé à Dust:', JSON.stringify(dustPayload, null, 2));
+        
         const dustResponse = await fetch('https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer sk-a893bcb7af5957be77de21ed265ba2fd',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                message: {
-                    content: message,
-                    context: {
-                        timezone: "Europe/Paris",
-                        username: "user",
-                        fullName: "Utilisateur Connect 2025",
-                        email: "user@connect2025.fr"
-                    },
-                    mentions: [{
-                        configurationId: 'Xl8LLukA05'
-                    }]
-                },
-                title: "Connect 2025 Chat",
-                blocking: true
-            })
+            body: JSON.stringify(dustPayload)
         });
         
+        const responseText = await dustResponse.text();
+        console.log('Réponse Dust:', responseText);
+        
         if (!dustResponse.ok) {
-            const errorText = await dustResponse.text();
-            throw new Error(`Dust API Error ${dustResponse.status}: ${errorText}`);
+            throw new Error(`Dust API Error ${dustResponse.status}: ${responseText}`);
         }
         
-        const data = await dustResponse.json();
+        const data = JSON.parse(responseText);
         
         // Extraction de la réponse
         let assistantResponse = "Je réfléchis à votre question...";
@@ -71,7 +70,7 @@ export default async function handler(req, res) {
         });
         
     } catch (error) {
-        console.error('Erreur API:', error);
+        console.error('Erreur API complète:', error);
         return res.status(500).json({ 
             error: 'Erreur interne du serveur', 
             details: error.message 
