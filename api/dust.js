@@ -13,13 +13,18 @@ export default async function handler(req, res) {
     }
     
     try {
-        const { message } = req.body;
+        const { message, conversationId } = req.body;
         
         if (!message) {
             return res.status(400).json({ error: 'Message requis' });
         }
         
-        // Format EXACT basé sur ce qui marche dans Make.com
+        // URL avec ou sans conversation existante
+        let dustUrl = 'https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations';
+        if (conversationId) {
+            dustUrl = `https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations/${conversationId}/messages`;
+        }
+        
         const dustPayload = {
             message: {
                 content: message,
@@ -35,13 +40,17 @@ export default async function handler(req, res) {
                     configurationId: 'Xl8LLukA05'
                 }]
             },
-            title: "Connect 2025 Chat",
             blocking: true
         };
         
+        // Ajouter title seulement pour nouvelle conversation
+        if (!conversationId) {
+            dustPayload.title = "Connect 2025 Chat";
+        }
+        
         console.log('📤 Envoi à Dust:', JSON.stringify(dustPayload, null, 2));
         
-        const dustResponse = await fetch('https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations', {
+        const dustResponse = await fetch(dustUrl, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer sk-a893bcb7af5957be77de21ed265ba2fd',
@@ -59,18 +68,25 @@ export default async function handler(req, res) {
         const data = await dustResponse.json();
         console.log('📥 Réponse Dust:', data);
         
-        // Extraction de la réponse (même logique que Make.com)
+        // Extraction de la réponse
         let assistantResponse = "Je traite votre demande...";
+        let newConversationId = conversationId;
         
-        if (data.conversation && data.conversation.content && data.conversation.content.length > 1) {
-            const lastMessage = data.conversation.content[1][0];
-            if (lastMessage && lastMessage.content) {
-                assistantResponse = lastMessage.content;
+        if (data.conversation) {
+            // Récupérer l'ID de conversation pour la suite
+            newConversationId = data.conversation.sId;
+            
+            if (data.conversation.content && data.conversation.content.length > 1) {
+                const lastMessage = data.conversation.content[data.conversation.content.length - 1][0];
+                if (lastMessage && lastMessage.content) {
+                    assistantResponse = lastMessage.content.trim();
+                }
             }
         }
         
         return res.status(200).json({ 
             response: assistantResponse,
+            conversationId: newConversationId,
             status: 'success'
         });
         
