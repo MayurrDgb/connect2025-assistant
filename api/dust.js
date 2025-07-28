@@ -1,15 +1,13 @@
 export default async function handler(req, res) {
-    // CORS pour permettre les appels depuis n'importe où
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // Gestion des requêtes OPTIONS (preflight)
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
     
-    // Seules les requêtes POST sont acceptées
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Méthode non autorisée' });
     }
@@ -21,7 +19,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Message requis' });
         }
         
-        // Appel à l'API Dust
+        // Format correct pour l'API Dust
         const dustResponse = await fetch('https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations', {
             method: 'POST',
             headers: {
@@ -31,6 +29,12 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 message: {
                     content: message,
+                    context: {
+                        timezone: "Europe/Paris",
+                        username: "user",
+                        fullName: "Utilisateur Connect 2025",
+                        email: "user@connect2025.fr"
+                    },
                     mentions: [{
                         configurationId: 'Xl8LLukA05'
                     }]
@@ -47,12 +51,11 @@ export default async function handler(req, res) {
         
         const data = await dustResponse.json();
         
-        // Extraction de la réponse de l'assistant
+        // Extraction de la réponse
         let assistantResponse = "Je réfléchis à votre question...";
         
         if (data.conversation && data.conversation.content) {
             const messages = data.conversation.content;
-            // Chercher le dernier message de l'assistant
             for (let i = messages.length - 1; i >= 0; i--) {
                 const msg = messages[i];
                 if (msg.type === 'agent_message' && msg.content) {
@@ -62,11 +65,9 @@ export default async function handler(req, res) {
             }
         }
         
-        // Retour de la réponse
         return res.status(200).json({ 
             response: assistantResponse, 
-            status: 'success',
-            timestamp: new Date().toISOString()
+            status: 'success'
         });
         
     } catch (error) {
