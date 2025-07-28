@@ -222,7 +222,7 @@ const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 
 // URL de votre webhook Make.com
-const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/42u0lc2hkwcj3iap02sd512fyffiwye1';
+const API_URL = '/api/dust';
 
 function addMessage(content, isUser = false) {
     const messageDiv = document.createElement('div');
@@ -261,7 +261,7 @@ function setInputEnabled(enabled) {
     sendButton.disabled = !enabled;
 }
 
-async function sendMessageToMake(userMessage) {
+async function sendMessageToAPI(userMessage) {
     try {
         console.log('🚀 Envoi vers Make.com...');
         
@@ -311,7 +311,7 @@ async function sendMessage() {
     showTyping();
     
     try {
-        const result = await sendMessageToMake(message);
+        const result = await sendMessageToAPI(message);
         
         // Délai pour l'UX
         setTimeout(() => {
