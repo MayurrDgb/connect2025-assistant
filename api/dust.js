@@ -19,14 +19,12 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Message requis' });
         }
         
-        // URL avec ou sans conversation existante
-        let dustUrl = 'https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations';
-        if (conversationId) {
-            dustUrl = `https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations/${conversationId}/messages`;
-        }
+        let dustUrl, dustPayload;
         
-        const dustPayload = {
-            message: {
+        if (conversationId) {
+            // Continuer une conversation existante
+            dustUrl = `https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations/${conversationId}/messages`;
+            dustPayload = {
                 content: message,
                 context: {
                     username: "connect2025-user",
@@ -38,14 +36,30 @@ export default async function handler(req, res) {
                 },
                 mentions: [{
                     configurationId: 'Xl8LLukA05'
-                }]
-            },
-            blocking: true
-        };
-        
-        // Ajouter title seulement pour nouvelle conversation
-        if (!conversationId) {
-            dustPayload.title = "Connect 2025 Chat";
+                }],
+                blocking: true
+            };
+        } else {
+            // Nouvelle conversation
+            dustUrl = 'https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations';
+            dustPayload = {
+                message: {
+                    content: message,
+                    context: {
+                        username: "connect2025-user",
+                        timezone: "Europe/Paris",
+                        fullName: "Participant Connect 2025",
+                        email: "participant@connect2025.fr",
+                        profilePictureUrl: null,
+                        origin: "api"
+                    },
+                    mentions: [{
+                        configurationId: 'Xl8LLukA05'
+                    }]
+                },
+                title: "Connect 2025 Chat",
+                blocking: true
+            };
         }
         
         console.log('📤 Envoi à Dust:', JSON.stringify(dustPayload, null, 2));
@@ -73,15 +87,17 @@ export default async function handler(req, res) {
         let newConversationId = conversationId;
         
         if (data.conversation) {
-            // Récupérer l'ID de conversation pour la suite
             newConversationId = data.conversation.sId;
             
-            if (data.conversation.content && data.conversation.content.length > 1) {
-                const lastMessage = data.conversation.content[data.conversation.content.length - 1][0];
-                if (lastMessage && lastMessage.content) {
-                    assistantResponse = lastMessage.content.trim();
+            if (data.conversation.content && data.conversation.content.length > 0) {
+                const lastMessageGroup = data.conversation.content[data.conversation.content.length - 1];
+                if (lastMessageGroup && lastMessageGroup[0] && lastMessageGroup[0].content) {
+                    assistantResponse = lastMessageGroup[0].content.trim();
                 }
             }
+        } else if (data.content) {
+            // Format pour message dans conversation existante
+            assistantResponse = data.content.trim();
         }
         
         return res.status(200).json({ 
