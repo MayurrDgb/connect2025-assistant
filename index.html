@@ -221,8 +221,8 @@ const chatInput = document.getElementById('chatInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 
-// URL de votre API (sera automatiquement la bonne sur Vercel)
-const API_URL = '/api/dust';
+// URL de votre webhook Make.com
+const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/42u0lc2hkwcj3iap02sd512fyffiwye1';
 
 function addMessage(content, isUser = false) {
     const messageDiv = document.createElement('div');
@@ -261,34 +261,35 @@ function setInputEnabled(enabled) {
     sendButton.disabled = !enabled;
 }
 
-async function sendMessageToAssistant(userMessage) {
+async function sendMessageToMake(userMessage) {
     try {
-        console.log('🚀 Envoi vers Assistant Connect 2025...');
+        console.log('🚀 Envoi vers Make.com...');
         
-        const response = await fetch(API_URL, {
+        const response = await fetch(MAKE_WEBHOOK_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: userMessage.trim()
+                message: userMessage.trim(),
+                timestamp: new Date().toISOString(),
+                source: 'Connect2025Chat'
             })
         });
 
         console.log('📡 Status:', response.status);
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || `Erreur ${response.status}`);
+            throw new Error(`Erreur HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('✅ Réponse reçue:', data);
+        console.log('✅ Réponse Make.com:', data);
         
         return data;
 
     } catch (error) {
-        console.error('❌ Erreur:', error);
+        console.error('❌ Erreur Make.com:', error);
         throw error;
     }
 }
@@ -306,25 +307,27 @@ async function sendMessage() {
     showTyping();
     
     try {
-        const result = await sendMessageToAssistant(message);
+        const result = await sendMessageToMake(message);
         
         // Délai pour l'UX
         setTimeout(() => {
             hideTyping();
             
-            let botResponse = "Désolé, je n'ai pas pu traiter votre demande.";
+            let botResponse = "L'assistant réfléchit...";
             
             if (result && result.response) {
-                botResponse = result.response;
+                botResponse = result.response.trim();
             } else if (result && result.error) {
                 botResponse = `Erreur : ${result.error}`;
+            } else if (typeof result === 'string') {
+                botResponse = result;
             }
             
             addMessage(botResponse);
             setInputEnabled(true);
             chatInput.focus();
             
-        }, 800);
+        }, 1200);
         
     } catch (error) {
         hideTyping();
