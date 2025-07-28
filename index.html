@@ -283,10 +283,14 @@ async function sendMessageToMake(userMessage) {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log('✅ Réponse Make.com:', data);
+        // Récupérer la réponse depuis le header
+        const assistantResponse = response.headers.get('X-Assistant-Response');
+        console.log('✅ Réponse depuis header:', assistantResponse);
         
-        return data;
+        return {
+            response: assistantResponse || "Réponse non trouvée",
+            status: "success"
+        };
 
     } catch (error) {
         console.error('❌ Erreur Make.com:', error);
