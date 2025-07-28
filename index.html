@@ -261,6 +261,10 @@ function setInputEnabled(enabled) {
     sendButton.disabled = !enabled;
 }
 
+// Ajoutez une variable globale
+let currentConversationId = null;
+
+// Modifiez sendMessageToAPI
 async function sendMessageToAPI(userMessage) {
     try {
         console.log('🚀 Envoi vers API Vercel...');
@@ -271,7 +275,8 @@ async function sendMessageToAPI(userMessage) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: userMessage.trim()
+                message: userMessage.trim(),
+                conversationId: currentConversationId
             })
         });
 
@@ -281,9 +286,13 @@ async function sendMessageToAPI(userMessage) {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
 
-        // Récupérer la réponse JSON
         const data = await response.json();
         console.log('✅ Réponse API:', data);
+        
+        // Sauvegarder l'ID de conversation
+        if (data.conversationId) {
+            currentConversationId = data.conversationId;
+        }
         
         return data;
 
