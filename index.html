@@ -265,7 +265,7 @@ async function sendMessageToAPI(userMessage) {
     try {
         console.log('🚀 Envoi vers Make.com...');
         
-        const response = await fetch(MAKE_WEBHOOK_URL, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
