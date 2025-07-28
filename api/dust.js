@@ -90,8 +90,9 @@ export default async function handler(req, res) {
         // Extraction de la réponse
         let assistantResponse = "Je traite votre demande...";
         let newConversationId = conversationId;
-        
+
         if (data.conversation) {
+            // Format nouvelle conversation
             newConversationId = data.conversation.sId;
             
             if (data.conversation.content && data.conversation.content.length > 0) {
@@ -100,8 +101,17 @@ export default async function handler(req, res) {
                     assistantResponse = lastMessageGroup[0].content.trim();
                 }
             }
+        } else if (data.agentMessages && data.agentMessages.length > 0) {
+            // Format continuation de conversation
+            const lastAgentMessage = data.agentMessages[data.agentMessages.length - 1];
+            if (lastAgentMessage && lastAgentMessage.content) {
+                assistantResponse = lastAgentMessage.content
+                    .replace(/\\n/g, '\n')  // Convertir les \n échappés
+                    .replace(/^\n+|\n+$/g, '')  // Supprimer les \n au début/fin
+                    .trim();
+            }
         } else if (data.content) {
-            // Format pour message dans conversation existante
+            // Autre format possible
             assistantResponse = data.content.trim();
         }
         
