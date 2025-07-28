@@ -221,7 +221,7 @@ const chatInput = document.getElementById('chatInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
 
-// URL de votre webhook Make.com
+// URL de votre API Vercel
 const API_URL = '/api/dust';
 
 function addMessage(content, isUser = false) {
@@ -263,7 +263,7 @@ function setInputEnabled(enabled) {
 
 async function sendMessageToAPI(userMessage) {
     try {
-        console.log('🚀 Envoi vers Make.com...');
+        console.log('🚀 Envoi vers API Vercel...');
         
         const response = await fetch(API_URL, {
             method: 'POST',
@@ -271,9 +271,7 @@ async function sendMessageToAPI(userMessage) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: userMessage.trim(),
-                timestamp: new Date().toISOString(),
-                source: 'Connect2025Chat'
+                message: userMessage.trim()
             })
         });
 
@@ -283,17 +281,14 @@ async function sendMessageToAPI(userMessage) {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
 
-        // Récupérer la réponse depuis le header
-        const assistantResponse = response.headers.get('X-Assistant-Response');
-        console.log('✅ Réponse depuis header:', assistantResponse);
+        // Récupérer la réponse JSON
+        const data = await response.json();
+        console.log('✅ Réponse API:', data);
         
-        return {
-            response: assistantResponse || "Réponse non trouvée",
-            status: "success"
-        };
+        return data;
 
     } catch (error) {
-        console.error('❌ Erreur Make.com:', error);
+        console.error('❌ Erreur API:', error);
         throw error;
     }
 }
@@ -323,8 +318,6 @@ async function sendMessage() {
                 botResponse = result.response.trim();
             } else if (result && result.error) {
                 botResponse = `Erreur : ${result.error}`;
-            } else if (typeof result === 'string') {
-                botResponse = result;
             }
             
             addMessage(botResponse);
