@@ -145,6 +145,7 @@
             background: white;
             border: 1px solid #e1e5e9;
             border-bottom-left-radius: 4px;
+            max-width: 85%;
         }
         
         .message.user .message-bubble {
@@ -153,8 +154,46 @@
             border-bottom-right-radius: 4px;
         }
         
+        /* Styles pour les messages formatés */
+        .message-bubble h2 {
+            font-size: 16px;
+            color: #E2001A;
+            margin: 10px 0 8px 0;
+            font-weight: 600;
+        }
+
+        .message-bubble h3 {
+            font-size: 15px;
+            color: #E2001A;
+            margin: 8px 0 6px 0;
+            font-weight: 600;
+        }
+
+        .message-bubble h4 {
+            font-size: 14px;
+            color: #333;
+            margin: 6px 0 4px 0;
+            font-weight: 600;
+        }
+
+        .message-bubble ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .message-bubble li {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .emoji-bullet {
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        
         .message-bubble p {
             margin-bottom: 12px;
+            line-height: 1.5;
         }
         
         .message-bubble p:last-child {
@@ -612,17 +651,17 @@
                 </textarea>
             </div>
             
-            <!-- Équipements -->
+            <!-- Équipements - SIMPLIFIÉ -->
             <div class="info-section">
-                <h3>📦 Équipements</h3>
+                <h3>📦 Livraison</h3>
                 <div class="info-grid">
                     <div class="info-item">
-                        <label>Équipements apportés</label>
+                        <label>Équipements/matériels à livrer</label>
                         <div class="value" id="equipementsApportes">-</div>
                     </div>
                     <div class="info-item">
-                        <label>Dimensions</label>
-                        <div class="value" id="dimensionsEquipements">-</div>
+                        <label>Date de livraison prévue</label>
+                        <div class="value" id="dateLivraison">-</div>
                     </div>
                 </div>
             </div>
@@ -704,6 +743,53 @@
         let chatInput = document.getElementById('chatInput');
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
+        
+        // Fonction de formatage des messages
+        function formatMessage(content) {
+            // Nettoyer et formater le contenu
+            let formatted = content
+                // Remplacer les doubles ** par des balises strong
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Remplacer les # par des titres
+                .replace(/### (.*?)$/gm, '<h4>$1</h4>')
+                .replace(/## (.*?)$/gm, '<h3>$1</h3>')
+                .replace(/# (.*?)$/gm, '<h2>$1</h2>')
+                // Remplacer les listes
+                .replace(/^\- (.*?)$/gm, '<li>$1</li>')
+                .replace(/^\d+\. (.*?)$/gm, '<li>$1</li>')
+                // Nettoyer les citations :cite[xx]
+                .replace(/:cite\[[^\]]+\]/g, '')
+                // Remplacer les emojis isolés en début de ligne
+                .replace(/^([🎯📦🚛📋⚡🔧])\s+/gm, '<span class="emoji-bullet">$1</span> ')
+                // Séparer les paragraphes (double saut de ligne)
+                .split('\n\n')
+                .map(paragraph => {
+                    paragraph = paragraph.trim();
+                    if (!paragraph) return '';
+                    
+                    // Si c'est une liste, l'entourer d'ul
+                    if (paragraph.includes('<li>')) {
+                        return '<ul>' + paragraph + '</ul>';
+                    }
+                    
+                    // Si c'est un titre, le laisser tel quel
+                    if (paragraph.startsWith('<h')) {
+                        return paragraph;
+                    }
+                    
+                    // Sinon, c'est un paragraphe
+                    return '<p>' + paragraph.replace(/\n/g, '<br>') + '</p>';
+                })
+                .filter(p => p)
+                .join('');
+            
+            // Mettre en évidence les mots-clés importants
+            formatted = formatted
+                .replace(/\b(Connect 2025|MBE France|Campus de Cély|infoconnect@mbefrance\.fr)\b/g, '<strong>$1</strong>')
+                .replace(/(infoconnect@mbefrance\.fr)/g, '<a href="mailto:$1">$1</a>');
+            
+            return formatted;
+        }
         
         // Fonction principale d'envoi de message
         async function sendMessage() {
@@ -954,7 +1040,7 @@
             chatInputExtended.focus();
         }
         
-        // Afficher les données partenaire
+        // Afficher les données partenaire - MODIFIÉ
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -965,8 +1051,10 @@
             document.getElementById('telephone').textContent = data['Téléphone'] || '-';
             document.getElementById('deadline').textContent = data['Deadline'] || '-';
             document.getElementById('description').value = data['Descriptif entreprise'] || '';
+            
+            // MODIFIÉ : Affichage simplifié
             document.getElementById('equipementsApportes').textContent = data['Équipements apportés'] || '-';
-            document.getElementById('dimensionsEquipements').textContent = data['Dimensions équipements'] || '-';
+            document.getElementById('dateLivraison').textContent = data['Date livraison souhaitée'] || '-';
             
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
@@ -1023,16 +1111,38 @@
             if (isUser) {
                 messageDiv.innerHTML = `<div class="message-bubble"><p>${escapeHtml(content)}</p></div>`;
             } else {
+                // Formater le contenu pour les messages bot
+                const formattedContent = formatMessage(content);
+                const quickActions = addQuickActions(content);
                 messageDiv.innerHTML = `
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
-                        <p>${content}</p>
+                        ${formattedContent}
+                        ${quickActions}
                     </div>
                 `;
             }
             
             getCurrentMessages().appendChild(messageDiv);
             getCurrentMessages().scrollTop = getCurrentMessages().scrollHeight;
+        }
+        
+        function addQuickActions(content) {
+            const actions = [];
+            
+            if (content.includes('livraison') || content.includes('transport')) {
+                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Informations livraison\')">🚚 Livraison</button>');
+            }
+            
+            if (content.includes('contact') || content.includes('équipe')) {
+                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contact équipe\')">📞 Contact</button>');
+            }
+            
+            if (actions.length > 0) {
+                return `<div class="quick-actions">${actions.join('')}</div>`;
+            }
+            
+            return '';
         }
         
         function sendQuickMessage(message) {
