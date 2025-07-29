@@ -415,6 +415,8 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                         <li>Équipements à livrer (affiches, livres, matériel, etc.)</li>
                         <li>Date de livraison souhaitée</li>
                         <li>Logos (.ai vectoriel ou PNG CMJN haute définition)</li>
+			<li>Thématique et descriptif Atelier (si vous avez pris l'option)</li>
+   			<li>Thématique et descriptif Speedmeeting (si vous avez pris l'option)</li>
                     </ul>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
                         <strong>Deadline importante :</strong> Toutes vos informations doivent être complétées avant le <strong style="color: #E2001A;">1er septembre 2025</strong>.
