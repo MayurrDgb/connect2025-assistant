@@ -18,154 +18,37 @@
             padding: 20px;
         }
         
-        /* Styles pour l'authentification */
-        .auth-container {
+        /* Interface chat seule au début */
+        .chat-only-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 20px;
+            height: calc(100vh - 40px);
         }
-
-        .auth-panel {
+        
+        .chat-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
+            height: 600px;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
-
-        .auth-header {
-            background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
-
-        .auth-header h2 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .auth-header .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .auth-content {
-            padding: 40px 30px;
-        }
-
-        .welcome-message {
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .welcome-message p {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .auth-form {
-            margin-bottom: 25px;
-        }
-
-        #codeInput {
-            width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
-            font-size: 16px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
-
-        #codeInput:focus {
-            border-color: #E2001A;
-            outline: none;
-        }
-
-        #authButton {
-            width: 100%;
-            padding: 15px;
-            background: #E2001A;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        #authButton:hover {
-            background: #c41e3a;
-            transform: translateY(-2px);
-        }
-
-        #authButton:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .auth-help {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .auth-help a {
-            color: #E2001A;
-            text-decoration: none;
-        }
-
-        .auth-help a:hover {
-            text-decoration: underline;
-        }
-
-        .auth-error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 15px;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* Animation */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .fade-out {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-
-        .fade-in {
-            opacity: 1;
-            transform: scale(1);
-            transition: all 0.3s ease;
-        }
         
-        /* Container principal à deux panneaux */
+        /* Interface complète (cachée au début) */
         .main-container {
-            display: flex;
+            display: none;
             gap: 20px;
             height: calc(100vh - 40px);
             max-width: 1400px;
             margin: 0 auto;
+        }
+        
+        .main-container.show {
+            display: flex;
         }
         
         /* Panel d'informations */
@@ -178,7 +61,7 @@
             overflow-y: auto;
         }
         
-        /* Panel chat */
+        /* Panel chat étendu */
         .chat-panel {
             flex: 1;
             background: white;
@@ -189,232 +72,7 @@
             overflow: hidden;
         }
         
-        /* Styles pour le panel d'informations */
-        .company-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #E2001A;
-            margin-bottom: 10px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #E2001A;
-            color: white;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .progress-container {
-            margin-top: 15px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #E2001A, #c41e3a);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        .progress-text {
-            text-align: center;
-            margin-top: 5px;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .info-section {
-            margin-bottom: 25px;
-        }
-        
-        .info-section h3 {
-            color: #E2001A;
-            margin-bottom: 15px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .editable-field {
-            width: 100%;
-            min-height: 100px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            padding: 12px;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
-        
-        .editable-field:focus {
-            border-color: #E2001A;
-            outline: none;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .info-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #E2001A;
-        }
-        
-        .info-item label {
-            font-weight: 600;
-            color: #333;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .info-item .value {
-            margin-top: 5px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .files-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        
-        .upload-zone {
-            border: 2px dashed #E2001A;
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-        
-        .upload-zone:hover {
-            background-color: #fff5f5;
-            border-color: #c41e3a;
-        }
-        
-        .upload-zone.dragover {
-            background-color: #fff5f5;
-            border-color: #c41e3a;
-            transform: scale(1.02);
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            color: #E2001A;
-            margin-bottom: 10px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .current-files {
-            margin-top: 15px;
-        }
-        
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .file-info {
-            flex: 1;
-        }
-        
-        .file-name {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .file-size {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .file-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .btn-small {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-download {
-            background: #E2001A;
-            color: white;
-        }
-        
-        .btn-download:hover {
-            background: #c41e3a;
-        }
-        
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: #c82333;
-        }
-        
-        .save-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1000;
-        }
-        
-        .save-indicator.show {
-            opacity: 1;
-        }
-        
-        /* Styles chat */
+        /* Vos styles existants pour le chat */
         .chat-header {
             background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
             color: white;
@@ -509,29 +167,6 @@
         }
         
         .message.user .message-bubble strong {
-            color: white;
-        }
-        
-        .message-bubble ul {
-            margin: 8px 0;
-            padding-left: 20px;
-        }
-        
-        .message-bubble li {
-            margin-bottom: 4px;
-        }
-        
-        .message-bubble a {
-            color: #E2001A;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .message-bubble a:hover {
-            text-decoration: underline;
-        }
-        
-        .message.user .message-bubble a {
             color: white;
         }
         
@@ -635,172 +270,56 @@
             transform: scale(1.05);
         }
         
-        .send-button:active {
-            transform: scale(0.95);
-        }
-        
         .send-button:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
         
+        /* Styles pour le panel d'informations (ajoutez vos styles existants) */
+        .company-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #E2001A;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #E2001A;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Ajoutez tous vos autres styles du panel d'informations ici */
+        
         /* Responsive */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            
-            .main-container {
+            .main-container.show {
                 flex-direction: column;
-                height: calc(100vh - 20px);
             }
             
             .info-panel {
                 flex: none;
                 height: 40%;
             }
-            
-            .chat-panel {
-                flex: 1;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .auth-container {
-                padding: 10px;
-            }
-            
-            .auth-content {
-                padding: 30px 20px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Écran d'authentification -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-panel">
-            <div class="auth-header">
-                <h2>🤖 Assistant Connect 2025</h2>
-                <div class="subtitle">26-28 septembre • Campus de Cély</div>
-            </div>
-            
-            <div class="auth-content">
-                <div class="welcome-message">
-                    <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France.</p>
-                    <p>Pour accéder à votre espace partenaire, veuillez saisir votre <strong>code d'accès unique</strong>.</p>
-                </div>
-                
-                <div class="auth-form">
-                    <input type="text" id="codeInput" placeholder="Saisissez votre code d'accès" 
-                           maxlength="20" onkeypress="handleCodeKeyPress(event)">
-                    <button id="authButton" onclick="authenticatePartner()">
-                        🔓 Accéder à mon espace
-                    </button>
-                </div>
-                
-                <div class="auth-help">
-                    <p>Vous n'avez pas votre code ? <a href="mailto:infoconnect@mbefrance.fr">Contactez-nous</a></p>
-                </div>
-                
-                <div class="auth-error" id="authError" style="display: none;">
-                    ❌ Code incorrect. Veuillez réessayer.
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Interface principale (cachée au début) -->
-    <div class="main-container" id="mainContainer" style="display: none;">
-        <!-- Panel d'informations -->
-        <div class="info-panel">
-            <div class="company-header">
-                <div class="company-name" id="companyName">Chargement...</div>
-                <div class="status-badge" id="statusBadge">En attente</div>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-text" id="progressText">0% complété</div>
-                </div>
-            </div>
-            
-            <!-- Informations générales -->
-            <div class="info-section">
-                <h3>📋 Informations générales</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Contact</label>
-                        <div class="value" id="nomContact">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Email</label>
-                        <div class="value" id="emailContact">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Téléphone</label>
-                        <div class="value" id="telephone">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Deadline</label>
-                        <div class="value" id="deadline">-</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Descriptif modifiable -->
-            <div class="info-section">
-                <h3>📝 Descriptif entreprise</h3>
-                <textarea 
-                    class="editable-field" 
-                    id="description" 
-                    placeholder="Saisissez le descriptif de votre entreprise..."
-                    onblur="saveDescription()">
-                </textarea>
-            </div>
-            
-            <!-- Équipements -->
-            <div class="info-section">
-                <h3>📦 Équipements</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Équipements apportés</label>
-                        <div class="value" id="equipementsApportes">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Dimensions</label>
-                        <div class="value" id="dimensionsEquipements">-</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fichiers -->
-            <div class="info-section">
-                <h3>📁 Documents et logos</h3>
-                <div class="files-section">
-                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
-                         ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
-                        <div class="upload-icon">📁</div>
-                        <p><strong>Glissez vos fichiers ici</strong></p>
-                        <p>ou cliquez pour sélectionner</p>
-                        <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                            Formats acceptés: JPG, PNG, GIF, WEBP (max 10MB)
-                        </p>
-                    </div>
-                    
-                    <input type="file" id="fileInput" class="file-input" 
-                           accept="image/*" multiple onchange="handleFileSelect(event)">
-                    
-                    <div class="current-files" id="filesList">
-                        <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Panel chat -->
-        <div class="chat-panel">
+    <!-- Interface chat seule au début -->
+    <div class="chat-only-container" id="chatOnlyContainer">
+        <div class="chat-container">
             <div class="chat-header">
                 <h2>🤖 Assistant Connect 2025</h2>
                 <div class="subtitle">26-28 septembre • Campus de Cély</div>
@@ -810,12 +329,11 @@
                 <div class="message bot">
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
-                        <p><strong>Parfait !</strong> Vous êtes maintenant connecté à votre espace partenaire.</p>
-                        <p>Je peux vous aider avec toutes vos questions concernant Connect 2025. Que souhaitez-vous savoir ?</p>
+                        <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France pour Connect 2025.</p>
+                        <p>Pour commencer, j'ai besoin de votre <strong>code d'accès unique</strong>.</p>
                         <div class="quick-actions">
-                            <button class="quick-btn" onclick="sendQuickMessage('Statut de mon dossier')">📊 Mon statut</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Informations livraison')">🚚 Livraison</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Contact équipe')">📞 Contact</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('J\'ai mon code')">✅ J'ai mon code</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('Je n\'ai pas mon code')">❌ Pas de code</button>
                         </div>
                     </div>
                 </div>
@@ -831,7 +349,7 @@
             
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="chatInput" 
-                       placeholder="Tapez votre message..." maxlength="500">
+                       placeholder="Tapez votre code ou votre message..." maxlength="500">
                 <button class="send-button" id="sendButton">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
@@ -841,142 +359,191 @@
         </div>
     </div>
     
-    <!-- Indicateur de sauvegarde -->
-    <div class="save-indicator" id="saveIndicator">
-        ✅ Sauvegardé automatiquement
+    <!-- Interface complète (cachée au début) -->
+    <div class="main-container" id="mainContainer">
+        <!-- Panel d'informations -->
+        <div class="info-panel">
+            <div class="company-header">
+                <div class="company-name" id="companyName">Chargement...</div>
+                <div class="status-badge" id="statusBadge">En attente</div>
+            </div>
+            
+            <!-- Ajoutez ici tous vos éléments du panel d'informations -->
+            
+        </div>
+        
+        <!-- Panel chat étendu -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <h2>🤖 Assistant Connect 2025</h2>
+                <div class="subtitle">26-28 septembre • Campus de Cély</div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessagesExtended">
+                <!-- Les messages seront copiés ici -->
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInputExtended" 
+                       placeholder="Tapez votre message..." maxlength="500">
+                <button class="send-button" id="sendButtonExtended">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         // Variables globales
+        let currentConversationId = null;
+        let currentPartnerData = null;
+        let isAuthenticated = false;
+        let awaitingCode = false;
+        
+        const API_URL = '/api/dust';
+        
+        // Éléments DOM
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
-        const API_URL = '/api/dust';
         
-        let currentConversationId = null;
-        let currentPartnerData = null;
-        let uploadedFiles = [];
-        let isAuthenticated = false;
-        let currentPartnerCode = null;
-        
-        // Fonctions d'authentification
-        async function authenticatePartner() {
-            const code = document.getElementById('codeInput').value.trim().toUpperCase();
-            const authButton = document.getElementById('authButton');
-            const authError = document.getElementById('authError');
+        // Fonction principale d'envoi de message
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
             
-            if (!code) {
-                showAuthError('Veuillez saisir votre code d\'accès');
-                return;
-            }
+            addMessage(message, true);
+            chatInput.value = '';
             
-            authButton.disabled = true;
-            authButton.textContent = '🔍 Vérification...';
-            authError.style.display = 'none';
+            setInputEnabled(false);
+            showTyping();
             
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'authenticate',
-                        codeUnique: code
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    currentPartnerCode = code;
-                    isAuthenticated = true;
-                    
-                    await loadPartnerData(code);
-                    showMainInterface();
-                    
+                // Si on attend un code et que le message ressemble à un code
+                if (awaitingCode && isLikelyCode(message)) {
+                    await handleCodeSubmission(message);
                 } else {
-                    showAuthError(result.error || 'Code d\'accès incorrect');
+                    await handleRegularMessage(message);
                 }
                 
             } catch (error) {
-                console.error('Erreur authentification:', error);
-                showAuthError('Erreur de connexion. Veuillez réessayer.');
-            } finally {
-                authButton.disabled = false;
-                authButton.textContent = '🔓 Accéder à mon espace';
+                hideTyping();
+                addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
+                setInputEnabled(true);
+                chatInput.focus();
             }
         }
-
-        function showAuthError(message) {
-            const authError = document.getElementById('authError');
-            authError.textContent = message;
-            authError.style.display = 'block';
-            
-            const codeInput = document.getElementById('codeInput');
-            codeInput.style.animation = 'shake 0.5s';
-            setTimeout(() => {
-                codeInput.style.animation = '';
-            }, 500);
+        
+        // Vérifier si le message ressemble à un code
+        function isLikelyCode(message) {
+            // Code probable si : tout en majuscules, contient des chiffres, longueur 3-20
+            return /^[A-Z0-9]{3,20}$/.test(message.toUpperCase());
         }
-
-        function showMainInterface() {
-            const authContainer = document.getElementById('authContainer');
+        
+        // Gérer la soumission d'un code
+        async function handleCodeSubmission(code) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'authenticate-and-load',
+                    codeUnique: code.toUpperCase()
+                })
+            });
+            
+            const result = await response.json();
+            
+            setTimeout(() => {
+                hideTyping();
+                
+                if (result.success) {
+                    // Authentification réussie
+                    currentPartnerData = result.partnerData;
+                    isAuthenticated = true;
+                    awaitingCode = false;
+                    
+                    addMessage(`✅ Parfait ! Bonjour ${result.partnerData.nomContact}. Je vais maintenant afficher votre espace partenaire personnalisé.`);
+                    
+                    // Transition vers l'interface complète après 2 secondes
+                    setTimeout(() => {
+                        showFullInterface();
+                    }, 2000);
+                    
+                } else {
+                    // Code incorrect
+                    addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
+                    awaitingCode = true;
+                }
+                
+                setInputEnabled(true);
+                chatInput.focus();
+            }, 1200);
+        }
+        
+        // Gérer un message normal
+        async function handleRegularMessage(message) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'chat',
+                    message: message,
+                    conversationId: currentConversationId,
+                    isAuthenticated: isAuthenticated
+                })
+            });
+            
+            const data = await response.json();
+            
+            setTimeout(() => {
+                hideTyping();
+                
+                let botResponse = "L'assistant réfléchit...";
+                
+                if (data && data.response) {
+                    botResponse = data.response.trim();
+                    
+                    // Vérifier si le bot demande un code
+                    if (botResponse.toLowerCase().includes('code') && !isAuthenticated) {
+                        awaitingCode = true;
+                    }
+                }
+                
+                if (data.conversationId) {
+                    currentConversationId = data.conversationId;
+                }
+                
+                addMessage(botResponse);
+                setInputEnabled(true);
+                chatInput.focus();
+                
+            }, 1200);
+        }
+        
+        // Afficher l'interface complète
+        function showFullInterface() {
+            const chatOnlyContainer = document.getElementById('chatOnlyContainer');
             const mainContainer = document.getElementById('mainContainer');
             
-            authContainer.classList.add('fade-out');
+            // Copier les messages vers le chat étendu
+            const chatMessagesExtended = document.getElementById('chatMessagesExtended');
+            chatMessagesExtended.innerHTML = chatMessages.innerHTML;
             
-            setTimeout(() => {
-                authContainer.style.display = 'none';
-                mainContainer.style.display = 'flex';
-                mainContainer.classList.add('fade-in');
-                
-                chatInput.focus();
-            }, 300);
-        }
-
-        function handleCodeKeyPress(event) {
-            if (event.key === 'Enter') {
-                authenticatePartner();
-            }
+            // Transition
+            chatOnlyContainer.style.display = 'none';
+            mainContainer.classList.add('show');
+            
+            // Remplir le panel d'informations
+            displayPartnerData(currentPartnerData);
+            
+            // Configurer les événements pour le chat étendu
+            setupExtendedChat();
         }
         
-        // Fonctions chat
-        function formatMessage(content) {
-            let formatted = content
-                .split('\n\n').map(p => p.trim()).filter(p => p).map(p => `<p>${p}</p>`).join('')
-                || `<p>${content.replace(/\n/g, '<br>')}</p>`;
-            
-            formatted = formatted
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\b(Connect 2025|MBE France|infoconnect@mbefrance\.fr|Campus de Cély)\b/g, '<strong>$1</strong>');
-            
-            formatted = formatted.replace(/(infoconnect@mbefrance\.fr)/g, '<a href="mailto:$1">$1</a>');
-            
-            return formatted;
-        }
-        
-        function addQuickActions(content) {
-            const actions = [];
-            
-            if (content.includes('statut') || content.includes('dossier')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Statut de mon dossier\')">📊 Mon statut</button>');
-            }
-            
-            if (content.includes('livraison') || content.includes('transport')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Informations livraison\')">🚚 Livraison</button>');
-            }
-            
-            if (content.includes('contact') || content.includes('équipe')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contact équipe\')">📞 Contact</button>');
-            }
-            
-            if (actions.length > 0) {
-                return `<div class="quick-actions">${actions.join('')}</div>`;
-            }
-            
-            return '';
-        }
-        
+        // Vos autres fonctions existantes...
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
@@ -984,13 +551,10 @@
             if (isUser) {
                 messageDiv.innerHTML = `<div class="message-bubble"><p>${escapeHtml(content)}</p></div>`;
             } else {
-                const formattedContent = formatMessage(content);
-                const quickActions = addQuickActions(content);
                 messageDiv.innerHTML = `
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
-                        ${formattedContent}
-                        ${quickActions}
+                        <p>${content}</p>
                     </div>
                 `;
             }
@@ -1024,256 +588,6 @@
             sendButton.disabled = !enabled;
         }
         
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message) return;
-            
-            addMessage(message, true);
-            chatInput.value = '';
-            
-            setInputEnabled(false);
-            showTyping();
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'chat',
-                        message: message,
-                        conversationId: currentConversationId
-                    })
-                });
-                
-                const data = await response.json();
-                
-                setTimeout(() => {
-                    hideTyping();
-                    
-                    let botResponse = "L'assistant réfléchit...";
-                    
-                    if (data && data.response) {
-                        botResponse = data.response.trim();
-                    } else if (data && data.error) {
-                        botResponse = `Erreur : ${data.error}`;
-                    }
-                    
-                    if (data.conversationId) {
-                        currentConversationId = data.conversationId;
-                    }
-                    
-                    addMessage(botResponse);
-                    setInputEnabled(true);
-                    chatInput.focus();
-                    
-                }, 1200);
-                
-            } catch (error) {
-                hideTyping();
-                addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
-                setInputEnabled(true);
-                chatInput.focus();
-            }
-        }
-        
-        // Fonctions pour le panel d'informations
-        async function loadPartnerData(codeUnique) {
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'get-partner-data',
-                        codeUnique: codeUnique
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    displayPartnerData(result.data);
-                }
-                
-            } catch (error) {
-                console.error('Erreur chargement données:', error);
-            }
-        }
-        
-        function displayPartnerData(data) {
-            document.getElementById('companyName').textContent = data.nomEntreprise;
-            document.getElementById('statusBadge').textContent = data.statutGlobal;
-            document.getElementById('nomContact').textContent = data.nomContact;
-            document.getElementById('emailContact').textContent = data.emailContact;
-            document.getElementById('telephone').textContent = data.telephone;
-            document.getElementById('deadline').textContent = data.deadline;
-            document.getElementById('description').value = data.descriptifEntreprise || '';
-            document.getElementById('equipementsApportes').textContent = data.equipementsApportes;
-            document.getElementById('dimensionsEquipements').textContent = data.dimensionsEquipements;
-            
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressFill.style.width = data.progression + '%';
-            progressText.textContent = data.progression + '% complété';
-            
-            currentPartnerData = data;
-        }
-        
-        async function saveDescription() {
-            const description = document.getElementById('description').value;
-            
-            if (!currentPartnerData) {
-                console.log('Aucune donnée partenaire chargée');
-                return;
-            }
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'save-description',
-                        codeUnique: currentPartnerData.codeUnique,
-                        description: description
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showSaveIndicator();
-                }
-                
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-            }
-        }
-        
-        function showSaveIndicator() {
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-        
-        // Fonctions upload de fichiers
-        function allowDrop(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-        
-        function removeDragover(event) {
-            event.currentTarget.classList.remove('dragover');
-        }
-        
-        function handleDrop(event) {
-            event.preventDefault();
-            event.currentTarget.classList.remove('dragover');
-            const files = event.dataTransfer.files;
-            processFiles(files);
-        }
-        
-        function handleFileSelect(event) {
-            const files = event.target.files;
-            processFiles(files);
-        }
-        
-        async function processFiles(files) {
-            for (let file of files) {
-                await uploadFile(file);
-            }
-        }
-        
-        async function uploadFile(file) {
-            try {
-                console.log('Upload fichier:', file.name);
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'upload-file',
-                        fileName: file.name,
-                        fileSize: file.size,
-                        contentType: file.type,
-                        codeUnique: currentPartnerData?.codeUnique
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    uploadedFiles.push({
-                        ...result.data,
-                        originalFile: file
-                    });
-                    updateFilesList();
-                    showSaveIndicator();
-                } else {
-                    alert('Erreur upload: ' + result.error);
-                }
-                
-            } catch (error) {
-                console.error('Erreur upload:', error);
-                alert('Erreur lors de l\'upload du fichier');
-            }
-        }
-        
-        function updateFilesList() {
-            const filesList = document.getElementById('filesList');
-            
-            if (uploadedFiles.length === 0) {
-                filesList.innerHTML = '<p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>';
-                return;
-            }
-            
-            filesList.innerHTML = uploadedFiles.map((file, index) => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-name">${file.fileName}</div>
-                        <div class="file-size">${formatFileSize(file.originalFile.size)}</div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="btn-small btn-download" onclick="downloadFile('${file.fileId}')">
-                            📥 Télécharger
-                        </button>
-                        <button class="btn-small btn-delete" onclick="deleteFile(${index})">
-                            🗑️ Supprimer
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        function downloadFile(fileId) {
-            const file = uploadedFiles.find(f => f.fileId === fileId);
-            if (file) {
-                const url = URL.createObjectURL(file.originalFile);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-        }
-        
-        function deleteFile(index) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
-                uploadedFiles.splice(index, 1);
-                updateFilesList();
-            }
-        }
-        
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', (e) => {
@@ -1285,7 +599,8 @@
         
         // Initialisation
         window.addEventListener('load', function() {
-            document.getElementById('codeInput').focus();
+            chatInput.focus();
+            awaitingCode = true; // On attend un code dès le début
         });
     </script>
 </body>
