@@ -48,7 +48,7 @@ export default async function handler(req, res) {
                 return handleContactTeam(req, res, otherData);
             default:
                 // Par défaut, traiter comme un message chat (compatibilité)
-                return handleChatMessage(req, res, message || req.body.message, conversationId, messageType, otherData);
+                return (req, res, message || req.body.message, conversationId, messageType, otherData);
         }
         
     } catch (error) {
@@ -719,23 +719,25 @@ async function handleChatMessage(req, res, message, conversationId, messageType,
         
         // NOUVEAU : Si c'est une réponse à une question spécifique, sauvegarder directement
         if (messageType && !['descriptif', 'logos', 'contact'].includes(messageType)) {
-            const fieldMapping = {
-                'equipements': 'Équipements apportés',
-                'dimensions': 'Dimensions équipements',
-                'encombrant': 'Matériel encombrant',
-                'livraison': 'Date livraison souhaitée',
-                'instructions': 'Instructions livraison spéciales',
-                'connectivite': 'Besoins connectivité additionnels'
-            };
-            
-            if (fieldMapping[messageType]) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: fieldMapping[messageType],
-                    value: message
-                });
-            }
-        }
+	    const fieldMapping = {
+		'equipements': 'Équipements apportés',
+		'dimensions': 'Dimensions équipements',
+		'encombrant': 'Matériel encombrant',
+		'livraison': 'Date livraison souhaitée',
+		'instructions': 'Instructions livraison spéciales',
+		'connectivite': 'Besoins connectivité additionnels',
+		'atelier': 'Atelier', // NOUVEAU
+		'speedmeeting': 'Speedmeeting' // NOUVEAU
+	    };
+	    
+	    if (fieldMapping[messageType]) {
+		await callGoogleScript('save-field', {
+		    codeUnique: partnerCode,
+		    fieldName: fieldMapping[messageType],
+		    value: message
+		});
+	    }
+	}
         
         // NOUVEAU : Si c'est un message pour l'équipe
         if (messageType === 'contact') {
