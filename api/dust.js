@@ -23,6 +23,8 @@ export default async function handler(req, res) {
                 return handleChatMessage(req, res, message, conversationId, otherData);
             case 'save-description':
                 return handleSaveDescription(req, res, otherData);
+            case 'get-partner-data':
+                return handleGetPartnerData(req, res, otherData);
             case 'upload-file':
                 return handleFileUpload(req, res, otherData);
             default:
@@ -111,6 +113,36 @@ async function handleAuthenticateAndLoad(req, res, data) {
         return res.status(500).json({
             success: false,
             error: 'Erreur technique lors de l\'authentification'
+        });
+    }
+}
+
+// Fonction pour récupérer les données partenaire
+async function handleGetPartnerData(req, res, data) {
+    const { codeUnique } = data;
+    
+    console.log('📊 Récupération données pour:', codeUnique);
+    
+    try {
+        const result = await callGoogleScript('get-partner-data', { codeUnique });
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                data: result.data
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                error: result.message || 'Partenaire non trouvé'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur récupération données:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la récupération des données'
         });
     }
 }
