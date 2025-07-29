@@ -27,7 +27,7 @@ export default async function handler(req, res) {
                 return handleGetPartnerData(req, res, otherData);
             case 'upload-file':
                 return handleFileUpload(req, res, otherData);
-            // NOUVEAU : Actions admin
+            // Actions admin
             case 'get-all-partners':
                 return handleGetAllPartners(req, res);
             case 'add-partner':
@@ -36,6 +36,11 @@ export default async function handler(req, res) {
                 return handleSendEmail(req, res, otherData);
             case 'export-data':
                 return handleExportData(req, res);
+            // NOUVEAU : Actions suppression et sync
+            case 'delete-partner':
+                return handleDeletePartner(req, res, otherData);
+            case 'force-sync':
+                return handleForceSync(req, res);
             default:
                 // Par défaut, traiter comme un message chat (compatibilité)
                 return handleChatMessage(req, res, message || req.body.message, conversationId, otherData);
@@ -517,7 +522,6 @@ async function handleAddPartner(req, res, data) {
     }
 }
 
-// NOUVEAU : Envoyer email de bienvenue
 // MODIFIÉ : Envoyer email de bienvenue avec lien
 async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
     try {
@@ -673,6 +677,73 @@ async function handleExportData(req, res) {
         return res.status(500).json({
             success: false,
             error: 'Erreur lors de l\'export des données'
+        });
+    }
+}
+
+// NOUVEAU : Supprimer un partenaire (admin)
+async function handleDeletePartner(req, res, data) {
+    const { partnerCode } = data;
+    
+    console.log('🗑️ Suppression partenaire:', partnerCode);
+    
+    try {
+        if (!partnerCode) {
+            return res.status(400).json({
+                success: false,
+                error: 'Code partenaire requis'
+            });
+        }
+        
+        const result = await callGoogleScript('delete-partner', {
+            partnerCode: partnerCode
+        });
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'Partenaire supprimé avec succès'
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: result.message || 'Erreur lors de la suppression'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur suppression partenaire:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la suppression du partenaire'
+        });
+    }
+}
+
+// NOUVEAU : Forcer la synchronisation
+async function handleForceSync(req, res) {
+    console.log('🔄 Synchronisation forcée');
+    
+    try {
+        const result = await callGoogleScript('force-sync', {});
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'Synchronisation terminée'
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: result.message || 'Erreur lors de la synchronisation'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur synchronisation:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la synchronisation'
         });
     }
 }
