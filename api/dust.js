@@ -13,14 +13,14 @@ export default async function handler(req, res) {
     }
     
     try {
-        const { action, message, conversationId, ...otherData } = req.body;
+        const { action, message, conversationId, messageType, ...otherData } = req.body;
         
         // Router selon l'action
         switch(action) {
             case 'authenticate-and-load':
                 return handleAuthenticateAndLoad(req, res, otherData);
             case 'chat':
-                return handleChatMessage(req, res, message, conversationId, otherData);
+                return handleChatMessage(req, res, message, conversationId, messageType, otherData);
             case 'save-description':
                 return handleSaveDescription(req, res, otherData);
             case 'get-partner-data':
@@ -36,14 +36,19 @@ export default async function handler(req, res) {
                 return handleSendEmail(req, res, otherData);
             case 'export-data':
                 return handleExportData(req, res);
-            // NOUVEAU : Actions suppression et sync
+            // Actions suppression et sync
             case 'delete-partner':
                 return handleDeletePartner(req, res, otherData);
             case 'force-sync':
                 return handleForceSync(req, res);
+            // NOUVEAU : Actions pour sauvegarder dans des champs spécifiques
+            case 'save-field':
+                return handleSaveField(req, res, otherData);
+            case 'contact-team':
+                return handleContactTeam(req, res, otherData);
             default:
                 // Par défaut, traiter comme un message chat (compatibilité)
-                return handleChatMessage(req, res, message || req.body.message, conversationId, otherData);
+                return handleChatMessage(req, res, message || req.body.message, conversationId, messageType, otherData);
         }
         
     } catch (error) {
@@ -182,189 +187,41 @@ async function callGoogleScript(action, data) {
     }
 }
 
-// MODIFIÉ : Analyser et enregistrer automatiquement les informations
+// OPTIMISÉ : Analyse plus flexible sans mots-clés spécifiques
 async function analyzeAndSaveInfo(message, partnerCode) {
-    if (!partnerCode) return;
+    if (!partnerCode || message.length < 10) return;
     
     try {
-        console.log('🔍 Analyse du message:', message);
+        // Analyse en parallèle au lieu de séquentiel
+        const promises = [];
         
-        // NOUVEAU : Détecter les descriptifs d'entreprise
-        const descriptifPatterns = [
-            /descriptif/i,
-            /description/i,
-            /présentation/i,
-            /entreprise/i,
-            /société/i,
-            /activité/i,
-            /spécialisé/i,
-            /nous sommes/i,
-            /notre entreprise/i,
-            /notre société/i,
-            /nous faisons/i,
-            /nous proposons/i
-        ];
-        
-        // Si le message contient des mots liés au descriptif ET fait plus de 20 caractères
-        if (descriptifPatterns.some(pattern => pattern.test(message)) && message.length > 20) {
-            console.log('📝 Descriptif détecté');
+        // Seulement détecter les descriptifs longs (plus de 30 caractères)
+        if (message.length > 30 && 
+            /descriptif|description|présentation|entreprise|société|activité|nous sommes|notre entreprise/i.test(message)) {
             
-            // Nettoyer le message pour extraire le descriptif
-            let descriptif = message;
-            
-            // Supprimer les phrases d'introduction communes
-            descriptif = descriptif
-                .replace(/^(voici|voilà|mon|notre|le)\s+(descriptif|description)\s+(de\s+)?(mon|notre|l'|la)?\s*(entreprise|société)\s*:?\s*/i, '')
-                .replace(/^(je veux|je souhaite|j'aimerais)\s+(renseigner|donner|ajouter)\s+(le|mon|notre)?\s*(descriptif|description)\s*:?\s*/i, '')
-                .replace(/^(pour\s+)?(le|mon|notre)\s*(descriptif|description)\s*:?\s*/i, '')
+            const cleanedMessage = message
+                .replace(/^(voici|voilà|mon|notre|le)\s+(descriptif|description)\s*:?\s*/i, '')
                 .trim();
             
-            // Enregistrer dans le Google Sheet
-            const result = await callGoogleScript('save-description', {
+            promises.push(callGoogleScript('save-description', {
                 codeUnique: partnerCode,
-                description: descriptif
-            });
-            
-            if (result.success) {
-                console.log('✅ Descriptif enregistré:', descriptif);
-            }
+                description: cleanedMessage
+            }));
         }
         
-        // Détecter les équipements/matériels
-        const equipmentPatterns = [
-            /imprimante[s]?/i,
-            /écran[s]?/i,
-            /stand[s]?/i,
-            /matériel/i,
-            /équipement[s]?/i,
-            /ordinateur[s]?/i,
-            /tablette[s]?/i,
-            /projecteur[s]?/i,
-            /borne[s]?/i
-        ];
+        // Pour le reste, laisser l'utilisateur choisir via les boutons
         
-        let equipmentInfo = '';
-        
-        // Extraire les informations d'équipements
-        if (equipmentPatterns.some(pattern => pattern.test(message))) {
-            // Extraire dimensions (ex: 2mx1m, 2m x 1m, etc.)
-            const dimensionMatch = message.match(/(\d+(?:\.\d+)?)\s*[mx×]\s*(\d+(?:\.\d+)?)/i);
-            // Extraire poids (ex: 100kg, 100 kg, etc.)
-            const weightMatch = message.match(/(\d+(?:\.\d+)?)\s*kg/i);
-            // Extraire quantité (ex: deux, 2, trois, etc.)
-            const quantityMatch = message.match(/(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|\d+)/i);
-            
-            equipmentInfo = message;
-            
-            // Si on a des détails, les formater proprement
-            if (dimensionMatch || weightMatch || quantityMatch) {
-                const parts = [];
-                
-                // Quantité
-                if (quantityMatch) {
-                    const qty = quantityMatch[1].toLowerCase();
-                    const numberMap = {
-                        'deux': '2', 'trois': '3', 'quatre': '4', 'cinq': '5',
-                        'six': '6', 'sept': '7', 'huit': '8', 'neuf': '9', 'dix': '10'
-                    };
-                    parts.push(numberMap[qty] || qty);
-                }
-                
-                // Type d'équipement
-                for (const pattern of equipmentPatterns) {
-                    const match = message.match(pattern);
-                    if (match) {
-                        parts.push(match[0]);
-                        break;
-                    }
-                }
-                
-                // Dimensions
-                if (dimensionMatch) {
-                    parts.push(`${dimensionMatch[1]}m x ${dimensionMatch[2]}m`);
-                }
-                
-                // Poids
-                if (weightMatch) {
-                    const unit = quantityMatch && parseInt(quantityMatch[1]) > 1 ? 'kg chacune' : 'kg';
-                    parts.push(`${weightMatch[1]}${unit}`);
-                }
-                
-                if (parts.length > 0) {
-                    equipmentInfo = parts.join(' ');
-                }
-            }
-            
-            // Enregistrer dans le Google Sheet
-            const result = await callGoogleScript('save-equipment', {
-                codeUnique: partnerCode,
-                equipment: equipmentInfo
-            });
-            
-            if (result.success) {
-                console.log('✅ Équipement enregistré:', equipmentInfo);
-            }
-        }
-        
-        // Détecter les dates de livraison
-        const datePatterns = [
-            /(\d{1,2})[\/\-](\d{1,2})/,
-            /(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)/i,
-            /(\d{1,2})\s+(septembre|october)/i,
-            /(22|23|24|25|26)\s+septembre/i
-        ];
-        
-        if (datePatterns.some(pattern => pattern.test(message))) {
-            const result = await callGoogleScript('save-delivery-date', {
-                codeUnique: partnerCode,
-                deliveryDate: message
-            });
-            
-            if (result.success) {
-                console.log('✅ Date livraison enregistrée');
-            }
-        }
-        
-        // Détecter les logos
-        const logoPatterns = [
-            /logo\s+(cmjn|cmyk)/i,
-            /logo\s+(négatif|negatif|fond\s+sombre)/i,
-            /logo\s+(couleur|color)/i
-        ];
-        
-        for (const pattern of logoPatterns) {
-            const match = message.match(pattern);
-            if (match) {
-                const logoType = match[1].toLowerCase();
-                let columnName = '';
-                
-                if (logoType.includes('cmjn') || logoType.includes('cmyk')) {
-                    columnName = 'Logo CMJN';
-                } else if (logoType.includes('négatif') || logoType.includes('negatif') || logoType.includes('sombre')) {
-                    columnName = 'Logo Négatif';
-                }
-                
-                if (columnName) {
-                    const result = await callGoogleScript('save-logo-type', {
-                        codeUnique: partnerCode,
-                        logoType: columnName,
-                        status: 'En attente d\'upload'
-                    });
-                    
-                    if (result.success) {
-                        console.log('✅ Type de logo enregistré:', columnName);
-                    }
-                }
-                break;
-            }
+        // Exécuter en parallèle
+        if (promises.length > 0) {
+            await Promise.all(promises);
         }
         
     } catch (error) {
-        console.error('❌ Erreur analyse automatique:', error);
+        console.error('❌ Erreur analyse:', error);
     }
 }
 
-// NOUVEAU : Authentifier ET charger les données en une fois
+// Authentifier ET charger les données en une fois
 async function handleAuthenticateAndLoad(req, res, data) {
     const { codeUnique } = data;
     
@@ -437,7 +294,7 @@ async function handleGetPartnerData(req, res, data) {
     }
 }
 
-// NOUVEAU : Récupérer tous les partenaires (admin)
+// Récupérer tous les partenaires (admin)
 async function handleGetAllPartners(req, res) {
     console.log('📊 Récupération de tous les partenaires (admin)');
     
@@ -465,7 +322,7 @@ async function handleGetAllPartners(req, res) {
     }
 }
 
-// NOUVEAU : Ajouter un partenaire (admin)
+// Ajouter un partenaire (admin)
 async function handleAddPartner(req, res, data) {
     const { companyName, contactName, contactEmail, contactPhone } = data;
     
@@ -522,7 +379,7 @@ async function handleAddPartner(req, res, data) {
     }
 }
 
-// MODIFIÉ : Envoyer email de bienvenue avec lien
+// Envoyer email de bienvenue avec lien
 async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
     try {
         const welcomeContent = `
@@ -541,7 +398,7 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                         Votre code d'accès unique est : <strong style="color: #E2001A; font-size: 18px;">${partnerCode}</strong>
                     </p>
                     
-                    <!-- NOUVEAU : Bouton d'accès à l'application -->
+                    <!-- Bouton d'accès à l'application -->
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="https://connect2025-assistant-3bjg4ha2m-mbe-projects.vercel.app/" 
                            style="display: inline-block; background: #E2001A; color: white; padding: 15px 30px; 
@@ -555,9 +412,9 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                     </p>
                     <ul style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
                         <li>Descriptif de votre entreprise</li>
-                        <li>Équipements à livrer</li>
+                        <li>Équipements à livrer (affiches, livres, matériel, etc.)</li>
                         <li>Date de livraison souhaitée</li>
-                        <li>Logos (CMJN et négatif)</li>
+                        <li>Logos (.ai vectoriel ou PNG CMJN haute définition)</li>
                     </ul>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
                         <strong>Deadline importante :</strong> Toutes vos informations doivent être complétées avant le <strong style="color: #E2001A;">1er septembre 2025</strong>.
@@ -589,7 +446,7 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
     }
 }
 
-// NOUVEAU : Envoyer email personnalisé (admin)
+// Envoyer email personnalisé (admin)
 async function handleSendEmail(req, res, data) {
     const { recipient, subject, message } = data;
     
@@ -653,7 +510,7 @@ async function handleSendEmail(req, res, data) {
     }
 }
 
-// NOUVEAU : Exporter les données (admin)
+// Exporter les données (admin)
 async function handleExportData(req, res) {
     console.log('📥 Export des données');
     
@@ -681,7 +538,7 @@ async function handleExportData(req, res) {
     }
 }
 
-// NOUVEAU : Supprimer un partenaire (admin)
+// Supprimer un partenaire (admin)
 async function handleDeletePartner(req, res, data) {
     const { partnerCode } = data;
     
@@ -720,7 +577,7 @@ async function handleDeletePartner(req, res, data) {
     }
 }
 
-// NOUVEAU : Forcer la synchronisation
+// Forcer la synchronisation
 async function handleForceSync(req, res) {
     console.log('🔄 Synchronisation forcée');
     
@@ -748,8 +605,104 @@ async function handleForceSync(req, res) {
     }
 }
 
-// Fonction pour gérer les messages chat (MODIFIÉE avec analyse automatique)
-async function handleChatMessage(req, res, message, conversationId, otherData) {
+// NOUVEAU : Sauvegarder dans un champ spécifique
+async function handleSaveField(req, res, data) {
+    const { codeUnique, fieldName, value } = data;
+    
+    console.log('💾 Sauvegarde champ:', { codeUnique, fieldName, value });
+    
+    try {
+        if (!codeUnique || !fieldName || !value) {
+            return res.status(400).json({
+                success: false,
+                error: 'Code unique, nom du champ et valeur sont requis'
+            });
+        }
+        
+        const result = await callGoogleScript('save-field', {
+            codeUnique,
+            fieldName,
+            value
+        });
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'Champ sauvegardé avec succès',
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: result.message || 'Erreur lors de la sauvegarde'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur sauvegarde champ:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la sauvegarde du champ'
+        });
+    }
+}
+
+// NOUVEAU : Envoyer message à l'équipe
+async function handleContactTeam(req, res, data) {
+    const { partnerCode, message, contactName, companyName } = data;
+    
+    console.log('📧 Message équipe de:', partnerCode);
+    
+    try {
+        const emailContent = `
+            <tr>
+                <td style="padding: 20px 0;">
+                    <h2 style="color: #E2001A; font-family: Ubuntu, Verdana, Arial, sans-serif; margin-bottom: 20px;">
+                        Message d'un partenaire Connect 2025
+                    </h2>
+                    <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
+                        <strong>Partenaire :</strong> ${companyName}<br>
+                        <strong>Contact :</strong> ${contactName}<br>
+                        <strong>Code :</strong> ${partnerCode}
+                    </p>
+                    <div style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        ${message.replace(/\n/g, '<br>')}
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        const htmlContent = EMAIL_TEMPLATE.replace('{{content}}', emailContent);
+        
+        const result = await callGoogleScript('send-email', {
+            to: 'infoconnect@mbefrance.fr',
+            subject: `Message partenaire - ${companyName} (${partnerCode})`,
+            htmlContent: htmlContent
+        });
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'Message envoyé à l\'équipe'
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: 'Erreur lors de l\'envoi'
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur contact équipe:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur lors de l\'envoi du message'
+        });
+    }
+}
+
+// MODIFIÉ : Fonction pour gérer les messages chat avec détection intelligente
+async function handleChatMessage(req, res, message, conversationId, messageType, otherData) {
     if (!message) {
         return res.status(400).json({ error: 'Message requis' });
     }
@@ -758,10 +711,54 @@ async function handleChatMessage(req, res, message, conversationId, otherData) {
     
     console.log('🔍 ConversationId reçu:', conversationId);
     console.log('🔐 Authentifié:', isAuthenticated, 'Code:', partnerCode);
+    console.log('📝 Type de message:', messageType);
     
     // NOUVEAU : Analyser et enregistrer automatiquement AVANT d'envoyer à Dust
     if (isAuthenticated && partnerCode) {
         await analyzeAndSaveInfo(message, partnerCode);
+        
+        // NOUVEAU : Si c'est une réponse à une question spécifique, sauvegarder directement
+        if (messageType && !['descriptif', 'logos', 'contact'].includes(messageType)) {
+            const fieldMapping = {
+                'equipements': 'Équipements apportés',
+                'dimensions': 'Dimensions équipements',
+                'encombrant': 'Matériel encombrant',
+                'livraison': 'Date livraison souhaitée',
+                'instructions': 'Instructions livraison spéciales',
+                'connectivite': 'Besoins connectivité additionnels'
+            };
+            
+            if (fieldMapping[messageType]) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: fieldMapping[messageType],
+                    value: message
+                });
+            }
+        }
+        
+        // NOUVEAU : Si c'est un message pour l'équipe
+        if (messageType === 'contact') {
+            try {
+                const partnerData = await callGoogleScript('get-partner-data', { codeUnique: partnerCode });
+                if (partnerData.success) {
+                    await handleContactTeam(req, res, {
+                        partnerCode: partnerCode,
+                        message: message,
+                        contactName: partnerData.data['Nom Contact'],
+                        companyName: partnerData.data['Nom Entreprise']
+                    });
+                    
+                    return res.status(200).json({
+                        response: "✅ Votre message a été envoyé à l'équipe organisatrice. Vous recevrez une réponse par email.",
+                        conversationId: conversationId,
+                        status: 'success'
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Erreur envoi message équipe:', error);
+            }
+        }
     }
     
     let dustUrl, dustPayload;
@@ -785,8 +782,8 @@ async function handleChatMessage(req, res, message, conversationId, otherData) {
                 contextInfo.email = partnerData.data['Email Contact'] || contextInfo.email;
                 contextInfo.username = `partner-${partnerCode}`;
                 
-                // Ajouter des infos contextuelles au message pour l'IA
-                message = `[CONTEXTE PARTENAIRE: ${partnerData.data['Nom Entreprise']}, Contact: ${partnerData.data['Nom Contact']}, Statut: ${partnerData.data['Statut Global']}] ${message}`;
+                // NOUVEAU : Contexte plus concis
+                message = `[PARTENAIRE: ${partnerData.data['Nom Entreprise']}, Statut: ${partnerData.data['Statut Global']}, Progression: ${partnerData.data['Progression %']}%] ${message}`;
             }
         } catch (error) {
             console.log('⚠️ Impossible d\'enrichir le contexte:', error.message);
@@ -872,7 +869,7 @@ async function handleChatMessage(req, res, message, conversationId, otherData) {
     }
     
     // Nettoyer la réponse des infos contextuelles ajoutées
-    assistantResponse = assistantResponse.replace(/\[CONTEXTE PARTENAIRE:.*?\]\s*/g, '');
+    assistantResponse = assistantResponse.replace(/\[PARTENAIRE:.*?\]\s*/g, '');
     
     console.log('✅ Réponse extraite:', assistantResponse);
     console.log('🆔 ConversationId final:', newConversationId);
@@ -941,20 +938,20 @@ async function handleFileUpload(req, res, data) {
             });
         }
         
-        // Vérifier le type de fichier (images seulement pour les logos)
+        // MODIFIÉ : Vérifier le type de fichier (.ai ou PNG CMJN)
         const allowedTypes = [
-            'image/jpeg', 
-            'image/jpg', 
             'image/png', 
-            'image/gif', 
-            'image/webp',
-            'image/svg+xml'
+            'application/postscript', // .ai files
+            'application/illustrator' // .ai files alternative
         ];
         
-        if (!allowedTypes.includes(contentType)) {
+        const isAiFile = fileName.toLowerCase().endsWith('.ai');
+        const isPngFile = contentType === 'image/png';
+        
+        if (!isAiFile && !isPngFile) {
             return res.status(400).json({
                 success: false,
-                error: 'Type de fichier non autorisé (images uniquement : JPG, PNG, GIF, WEBP, SVG)'
+                error: 'Type de fichier non autorisé (uniquement .ai vectoriel ou PNG CMJN haute définition)'
             });
         }
         
