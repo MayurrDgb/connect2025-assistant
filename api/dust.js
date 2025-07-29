@@ -74,6 +74,147 @@ async function callGoogleScript(action, data) {
     }
 }
 
+// NOUVEAU : Analyser et enregistrer automatiquement les informations
+async function analyzeAndSaveInfo(message, partnerCode) {
+    if (!partnerCode) return;
+    
+    try {
+        console.log('🔍 Analyse du message:', message);
+        
+        // Détecter les équipements/matériels
+        const equipmentPatterns = [
+            /imprimante[s]?/i,
+            /écran[s]?/i,
+            /stand[s]?/i,
+            /matériel/i,
+            /équipement[s]?/i,
+            /ordinateur[s]?/i,
+            /tablette[s]?/i,
+            /projecteur[s]?/i,
+            /borne[s]?/i
+        ];
+        
+        let equipmentInfo = '';
+        
+        // Extraire les informations d'équipements
+        if (equipmentPatterns.some(pattern => pattern.test(message))) {
+            // Extraire dimensions (ex: 2mx1m, 2m x 1m, etc.)
+            const dimensionMatch = message.match(/(\d+(?:\.\d+)?)\s*[mx×]\s*(\d+(?:\.\d+)?)/i);
+            // Extraire poids (ex: 100kg, 100 kg, etc.)
+            const weightMatch = message.match(/(\d+(?:\.\d+)?)\s*kg/i);
+            // Extraire quantité (ex: deux, 2, trois, etc.)
+            const quantityMatch = message.match(/(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|\d+)/i);
+            
+            equipmentInfo = message;
+            
+            // Si on a des détails, les formater proprement
+            if (dimensionMatch || weightMatch || quantityMatch) {
+                const parts = [];
+                
+                // Quantité
+                if (quantityMatch) {
+                    const qty = quantityMatch[1].toLowerCase();
+                    const numberMap = {
+                        'deux': '2', 'trois': '3', 'quatre': '4', 'cinq': '5',
+                        'six': '6', 'sept': '7', 'huit': '8', 'neuf': '9', 'dix': '10'
+                    };
+                    parts.push(numberMap[qty] || qty);
+                }
+                
+                // Type d'équipement
+                for (const pattern of equipmentPatterns) {
+                    const match = message.match(pattern);
+                    if (match) {
+                        parts.push(match[0]);
+                        break;
+                    }
+                }
+                
+                // Dimensions
+                if (dimensionMatch) {
+                    parts.push(`${dimensionMatch[1]}m x ${dimensionMatch[2]}m`);
+                }
+                
+                // Poids
+                if (weightMatch) {
+                    const unit = quantityMatch && parseInt(quantityMatch[1]) > 1 ? 'kg chacune' : 'kg';
+                    parts.push(`${weightMatch[1]}${unit}`);
+                }
+                
+                if (parts.length > 0) {
+                    equipmentInfo = parts.join(' ');
+                }
+            }
+            
+            // Enregistrer dans le Google Sheet
+            const result = await callGoogleScript('save-equipment', {
+                codeUnique: partnerCode,
+                equipment: equipmentInfo
+            });
+            
+            if (result.success) {
+                console.log('✅ Équipement enregistré:', equipmentInfo);
+            }
+        }
+        
+        // Détecter les dates de livraison
+        const datePatterns = [
+            /(\d{1,2})[\/\-](\d{1,2})/,
+            /(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)/i,
+            /(\d{1,2})\s+(septembre|october)/i,
+            /(22|23|24|25|26)\s+septembre/i
+        ];
+        
+        if (datePatterns.some(pattern => pattern.test(message))) {
+            const result = await callGoogleScript('save-delivery-date', {
+                codeUnique: partnerCode,
+                deliveryDate: message
+            });
+            
+            if (result.success) {
+                console.log('✅ Date livraison enregistrée');
+            }
+        }
+        
+        // Détecter les logos
+        const logoPatterns = [
+            /logo\s+(cmjn|cmyk)/i,
+            /logo\s+(négatif|negatif|fond\s+sombre)/i,
+            /logo\s+(couleur|color)/i
+        ];
+        
+        for (const pattern of logoPatterns) {
+            const match = message.match(pattern);
+            if (match) {
+                const logoType = match[1].toLowerCase();
+                let columnName = '';
+                
+                if (logoType.includes('cmjn') || logoType.includes('cmyk')) {
+                    columnName = 'Logo CMJN';
+                } else if (logoType.includes('négatif') || logoType.includes('negatif') || logoType.includes('sombre')) {
+                    columnName = 'Logo Négatif';
+                }
+                
+                if (columnName) {
+                    const result = await callGoogleScript('save-logo-type', {
+                        codeUnique: partnerCode,
+                        logoType: columnName,
+                        status: 'En attente d\'upload'
+                    });
+                    
+                    if (result.success) {
+                        console.log('✅ Type de logo enregistré:', columnName);
+                    }
+                }
+                break;
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur analyse automatique:', error);
+    }
+}
+
 // NOUVEAU : Authentifier ET charger les données en une fois
 async function handleAuthenticateAndLoad(req, res, data) {
     const { codeUnique } = data;
@@ -147,7 +288,7 @@ async function handleGetPartnerData(req, res, data) {
     }
 }
 
-// Fonction pour gérer les messages chat (votre code existant + améliorations)
+// Fonction pour gérer les messages chat (MODIFIÉE avec analyse automatique)
 async function handleChatMessage(req, res, message, conversationId, otherData) {
     if (!message) {
         return res.status(400).json({ error: 'Message requis' });
@@ -157,6 +298,11 @@ async function handleChatMessage(req, res, message, conversationId, otherData) {
     
     console.log('🔍 ConversationId reçu:', conversationId);
     console.log('🔐 Authentifié:', isAuthenticated, 'Code:', partnerCode);
+    
+    // NOUVEAU : Analyser et enregistrer automatiquement AVANT d'envoyer à Dust
+    if (isAuthenticated && partnerCode) {
+        await analyzeAndSaveInfo(message, partnerCode);
+    }
     
     let dustUrl, dustPayload;
     
