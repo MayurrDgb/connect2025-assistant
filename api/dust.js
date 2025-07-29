@@ -518,6 +518,7 @@ async function handleAddPartner(req, res, data) {
 }
 
 // NOUVEAU : Envoyer email de bienvenue
+// MODIFIÉ : Envoyer email de bienvenue avec lien
 async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
     try {
         const welcomeContent = `
@@ -535,8 +536,18 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
                         Votre code d'accès unique est : <strong style="color: #E2001A; font-size: 18px;">${partnerCode}</strong>
                     </p>
+                    
+                    <!-- NOUVEAU : Bouton d'accès à l'application -->
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="https://connect2025-assistant-3bjg4ha2m-mbe-projects.vercel.app/" 
+                           style="display: inline-block; background: #E2001A; color: white; padding: 15px 30px; 
+                                  text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                            🚀 Accéder à votre espace partenaire
+                        </a>
+                    </div>
+                    
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
-                        Utilisez ce code pour accéder à votre espace partenaire et renseigner vos informations :
+                        Utilisez ce lien et votre code d'accès pour renseigner vos informations :
                     </p>
                     <ul style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
                         <li>Descriptif de votre entreprise</li>
