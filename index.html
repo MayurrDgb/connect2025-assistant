@@ -1292,22 +1292,24 @@
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
         
-        // NOUVEAU : Boutons d'action dynamiques
-        function addActionButtons() {
-            return `
-                <div class="quick-actions">
-                    <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
-                </div>
-            `;
-        }
+        // MODIFIÉ : Boutons d'action avec les nouveaux champs
+function addActionButtons() {
+    return `
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
+        </div>
+    `;
+}
         
         // Fonction de formatage des messages
         function formatMessage(content) {
@@ -2021,7 +2023,7 @@
         
         // Gérer un message normal - MODIFIÉ avec détection intelligente
         async function handleRegularMessage(message) {
-            // NOUVEAU : Détecter le type de message selon les boutons cliqués
+            // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
             else if (message === 'Équipements apportés') lastBotMessageType = 'equipements';
             else if (message === 'Dimensions équipements') lastBotMessageType = 'dimensions';
@@ -2029,6 +2031,8 @@
             else if (message === 'Date livraison') lastBotMessageType = 'livraison';
             else if (message === 'Instructions livraison') lastBotMessageType = 'instructions';
             else if (message === 'Besoins connectivité') lastBotMessageType = 'connectivite';
+            else if (message === 'Atelier') lastBotMessageType = 'atelier'; // NOUVEAU
+            else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting'; // NOUVEAU
             else if (message === 'Logos') lastBotMessageType = 'logos';
             else if (message === 'Contacter équipe') lastBotMessageType = 'contact';
             
