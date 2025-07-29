@@ -717,19 +717,21 @@
             showTyping();
             
             try {
-    // Si on attend un code et que le message ressemble à un code
-    if (awaitingCode && isLikelyCode(message)) {
-        await handleCodeSubmission(message); // ← Passer le message complet
-    } else {
-        await handleRegularMessage(message);
-    }
-    
-} catch (error) {
-    hideTyping();
-    addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
-    setInputEnabled(true);
-    getCurrentInput().focus();
-}
+                // Si on attend un code et que le message contient un code
+                const extractedCode = isLikelyCode(message);
+                if (awaitingCode && extractedCode) {
+                    await handleCodeSubmission(extractedCode);
+                } else {
+                    await handleRegularMessage(message);
+                }
+                
+            } catch (error) {
+                hideTyping();
+                addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
+                setInputEnabled(true);
+                getCurrentInput().focus();
+            }
+        }
         
         // Fonctions utilitaires pour gérer les deux modes
         function getCurrentInput() {
@@ -744,127 +746,116 @@
             return isExtendedMode ? document.getElementById('typingIndicatorExtended') : typingIndicator;
         }
         
-// Vérifier si le message contient un code
-function isLikelyCode(message) {
-    // Chercher un pattern de code dans le message
-    const codePattern = /\b[A-Z0-9]{3,20}\b/g;
-    const matches = message.toUpperCase().match(codePattern);
-    
-    if (matches) {
-        // Si on trouve des codes potentiels, vérifier s'ils ressemblent à nos codes
-        for (let match of matches) {
-            // Nos codes contiennent généralement des lettres ET des chiffres
-            if (/[A-Z]/.test(match) && /[0-9]/.test(match)) {
-                return match; // Retourner le code trouvé
-            }
-        }
-    }
-    
-    return false;
-}
-        
-// Gérer la soumission d'un code
-async function handleCodeSubmission(message) {
-    // Extraire le code du message
-    const code = typeof message === 'string' && message.length > 10 ? 
-                 isLikelyCode(message) : message;
-    
-    if (!code) {
-        addMessage("❌ Je n'ai pas pu identifier votre code. Pouvez-vous le taper seul, sans autre texte ?");
-        setInputEnabled(true);
-        getCurrentInput().focus();
-        return;
-    }
-    
-    try {
-        console.log('🔐 Code extrait:', code);
-        
-        // Étape 1 : Authentifier avec le code extrait
-        const authResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'authenticate-and-load',
-                codeUnique: code.toString().toUpperCase()
-            })
-        });
-        
-        const authResult = await authResponse.json();
-        console.log('🔐 Résultat authentification:', authResult);
-        
-        setTimeout(async () => {
-            hideTyping();
+        // Vérifier si le message contient un code
+        function isLikelyCode(message) {
+            // Chercher un pattern de code dans le message
+            const codePattern = /\b[A-Z0-9]{3,20}\b/g;
+            const matches = message.toUpperCase().match(codePattern);
             
-            if (authResult.success && authResult.partnerData) {
-                // Authentification réussie avec données
-                currentPartnerData = authResult.partnerData;
-                currentPartnerCode = code.toString().toUpperCase();
-                isAuthenticated = true;
-                awaitingCode = false;
+            if (matches) {
+                // Si on trouve des codes potentiels, vérifier s'ils ressemblent à nos codes
+                for (let match of matches) {
+                    // Nos codes contiennent généralement des lettres ET des chiffres
+                    if (/[A-Z]/.test(match) && /[0-9]/.test(match)) {
+                        return match; // Retourner le code trouvé
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // Gérer la soumission d'un code
+        async function handleCodeSubmission(code) {
+            try {
+                console.log('🔐 Code extrait:', code);
                 
-                const contactName = authResult.partnerData['Nom Contact'] || 'Partenaire';
-                addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
+                // Étape 1 : Authentifier avec le code extrait
+                const authResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'authenticate-and-load',
+                        codeUnique: code.toString().toUpperCase()
+                    })
+                });
                 
-                setTimeout(() => {
-                    showFullInterface();
-                }, 2000);
+                const authResult = await authResponse.json();
+                console.log('🔐 Résultat authentification:', authResult);
                 
-            } else if (authResult.success && !authResult.partnerData) {
-                // Authentification OK mais pas de données - on les récupère séparément
-                console.log('🔄 Authentification OK, récupération des données...');
-                
-                try {
-                    const dataResponse = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'get-partner-data',
-                            codeUnique: code.toString().toUpperCase()
-                        })
-                    });
+                setTimeout(async () => {
+                    hideTyping();
                     
-                    const dataResult = await dataResponse.json();
-                    console.log('📊 Résultat données:', dataResult);
-                    
-                    if (dataResult.success && dataResult.data) {
-                        currentPartnerData = dataResult.data;
+                    if (authResult.success && authResult.partnerData) {
+                        // Authentification réussie avec données
+                        currentPartnerData = authResult.partnerData;
                         currentPartnerCode = code.toString().toUpperCase();
                         isAuthenticated = true;
                         awaitingCode = false;
                         
-                        const contactName = dataResult.data['Nom Contact'] || 'Partenaire';
+                        const contactName = authResult.partnerData['Nom Contact'] || 'Partenaire';
                         addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
                         
                         setTimeout(() => {
                             showFullInterface();
                         }, 2000);
+                        
+                    } else if (authResult.success && !authResult.partnerData) {
+                        // Authentification OK mais pas de données - on les récupère séparément
+                        console.log('🔄 Authentification OK, récupération des données...');
+                        
+                        try {
+                            const dataResponse = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    action: 'get-partner-data',
+                                    codeUnique: code.toString().toUpperCase()
+                                })
+                            });
+                            
+                            const dataResult = await dataResponse.json();
+                            console.log('📊 Résultat données:', dataResult);
+                            
+                            if (dataResult.success && dataResult.data) {
+                                currentPartnerData = dataResult.data;
+                                currentPartnerCode = code.toString().toUpperCase();
+                                isAuthenticated = true;
+                                awaitingCode = false;
+                                
+                                const contactName = dataResult.data['Nom Contact'] || 'Partenaire';
+                                addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
+                                
+                                setTimeout(() => {
+                                    showFullInterface();
+                                }, 2000);
+                            } else {
+                                addMessage("⚠️ Code valide mais impossible de charger vos données. Contactez infoconnect@mbefrance.fr");
+                            }
+                            
+                        } catch (dataError) {
+                            console.error('❌ Erreur chargement données:', dataError);
+                            addMessage("⚠️ Code valide mais erreur technique. Contactez infoconnect@mbefrance.fr");
+                        }
+                        
                     } else {
-                        addMessage("⚠️ Code valide mais impossible de charger vos données. Contactez infoconnect@mbefrance.fr");
+                        // Code incorrect
+                        addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
+                        awaitingCode = true;
                     }
                     
-                } catch (dataError) {
-                    console.error('❌ Erreur chargement données:', dataError);
-                    addMessage("⚠️ Code valide mais erreur technique. Contactez infoconnect@mbefrance.fr");
-                }
+                    setInputEnabled(true);
+                    getCurrentInput().focus();
+                }, 1200);
                 
-            } else {
-                // Code incorrect
-                addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
-                awaitingCode = true;
+            } catch (error) {
+                console.error('❌ Erreur authentification:', error);
+                hideTyping();
+                addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
+                setInputEnabled(true);
+                getCurrentInput().focus();
             }
-            
-            setInputEnabled(true);
-            getCurrentInput().focus();
-        }, 1200);
-        
-    } catch (error) {
-        console.error('❌ Erreur authentification:', error);
-        hideTyping();
-        addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
-        setInputEnabled(true);
-        getCurrentInput().focus();
-    }
-}
+        }
         
         // Gérer un message normal
         async function handleRegularMessage(message) {
