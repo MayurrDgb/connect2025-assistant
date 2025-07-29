@@ -18,6 +18,147 @@
             padding: 20px;
         }
         
+        /* Styles pour l'authentification */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-panel {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .auth-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .auth-header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .auth-content {
+            padding: 40px 30px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .welcome-message p {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .auth-form {
+            margin-bottom: 25px;
+        }
+
+        #codeInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        #codeInput:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+
+        #authButton {
+            width: 100%;
+            padding: 15px;
+            background: #E2001A;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #authButton:hover {
+            background: #c41e3a;
+            transform: translateY(-2px);
+        }
+
+        #authButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-help {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .auth-help a {
+            color: #E2001A;
+            text-decoration: none;
+        }
+
+        .auth-help a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .fade-in {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.3s ease;
+        }
+        
         /* Container principal à deux panneaux */
         .main-container {
             display: flex;
@@ -200,7 +341,7 @@
         
         .file-item {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             padding: 12px;
             background: white;
@@ -273,7 +414,7 @@
             opacity: 1;
         }
         
-        /* Styles chat (vos styles existants) */
+        /* Styles chat */
         .chat-header {
             background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
             color: white;
@@ -525,11 +666,53 @@
             .info-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .auth-container {
+                padding: 10px;
+            }
+            
+            .auth-content {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
+    <!-- Écran d'authentification -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-panel">
+            <div class="auth-header">
+                <h2>🤖 Assistant Connect 2025</h2>
+                <div class="subtitle">26-28 septembre • Campus de Cély</div>
+            </div>
+            
+            <div class="auth-content">
+                <div class="welcome-message">
+                    <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France.</p>
+                    <p>Pour accéder à votre espace partenaire, veuillez saisir votre <strong>code d'accès unique</strong>.</p>
+                </div>
+                
+                <div class="auth-form">
+                    <input type="text" id="codeInput" placeholder="Saisissez votre code d'accès" 
+                           maxlength="20" onkeypress="handleCodeKeyPress(event)">
+                    <button id="authButton" onclick="authenticatePartner()">
+                        🔓 Accéder à mon espace
+                    </button>
+                </div>
+                
+                <div class="auth-help">
+                    <p>Vous n'avez pas votre code ? <a href="mailto:infoconnect@mbefrance.fr">Contactez-nous</a></p>
+                </div>
+                
+                <div class="auth-error" id="authError" style="display: none;">
+                    ❌ Code incorrect. Veuillez réessayer.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interface principale (cachée au début) -->
+    <div class="main-container" id="mainContainer" style="display: none;">
         <!-- Panel d'informations -->
         <div class="info-panel">
             <div class="company-header">
@@ -627,12 +810,12 @@
                 <div class="message bot">
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
-                        <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France pour Connect 2025.</p>
-                        <p>Pour commencer, j'ai besoin de votre <strong>code d'accès unique</strong>.</p>
+                        <p><strong>Parfait !</strong> Vous êtes maintenant connecté à votre espace partenaire.</p>
+                        <p>Je peux vous aider avec toutes vos questions concernant Connect 2025. Que souhaitez-vous savoir ?</p>
                         <div class="quick-actions">
-                            <button class="quick-btn" onclick="sendQuickMessage('J\'ai mon code')">✅ J'ai mon code</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Je n\'ai pas mon code')">❌ Pas de code</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Informations sur l\'événement')">ℹ️ Infos événement</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('Statut de mon dossier')">📊 Mon statut</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('Informations livraison')">🚚 Livraison</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('Contact équipe')">📞 Contact</button>
                         </div>
                     </div>
                 </div>
@@ -674,8 +857,90 @@
         let currentConversationId = null;
         let currentPartnerData = null;
         let uploadedFiles = [];
+        let isAuthenticated = false;
+        let currentPartnerCode = null;
         
-        // Fonctions chat (vos fonctions existantes)
+        // Fonctions d'authentification
+        async function authenticatePartner() {
+            const code = document.getElementById('codeInput').value.trim().toUpperCase();
+            const authButton = document.getElementById('authButton');
+            const authError = document.getElementById('authError');
+            
+            if (!code) {
+                showAuthError('Veuillez saisir votre code d\'accès');
+                return;
+            }
+            
+            authButton.disabled = true;
+            authButton.textContent = '🔍 Vérification...';
+            authError.style.display = 'none';
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'authenticate',
+                        codeUnique: code
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentPartnerCode = code;
+                    isAuthenticated = true;
+                    
+                    await loadPartnerData(code);
+                    showMainInterface();
+                    
+                } else {
+                    showAuthError(result.error || 'Code d\'accès incorrect');
+                }
+                
+            } catch (error) {
+                console.error('Erreur authentification:', error);
+                showAuthError('Erreur de connexion. Veuillez réessayer.');
+            } finally {
+                authButton.disabled = false;
+                authButton.textContent = '🔓 Accéder à mon espace';
+            }
+        }
+
+        function showAuthError(message) {
+            const authError = document.getElementById('authError');
+            authError.textContent = message;
+            authError.style.display = 'block';
+            
+            const codeInput = document.getElementById('codeInput');
+            codeInput.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                codeInput.style.animation = '';
+            }, 500);
+        }
+
+        function showMainInterface() {
+            const authContainer = document.getElementById('authContainer');
+            const mainContainer = document.getElementById('mainContainer');
+            
+            authContainer.classList.add('fade-out');
+            
+            setTimeout(() => {
+                authContainer.style.display = 'none';
+                mainContainer.style.display = 'flex';
+                mainContainer.classList.add('fade-in');
+                
+                chatInput.focus();
+            }, 300);
+        }
+
+        function handleCodeKeyPress(event) {
+            if (event.key === 'Enter') {
+                authenticatePartner();
+            }
+        }
+        
+        // Fonctions chat
         function formatMessage(content) {
             let formatted = content
                 .split('\n\n').map(p => p.trim()).filter(p => p).map(p => `<p>${p}</p>`).join('')
@@ -693,18 +958,16 @@
         function addQuickActions(content) {
             const actions = [];
             
-            if (content.includes('code d\'accès') || content.includes('code')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'J\\\'ai mon code\')">✅ J\'ai mon code</button>');
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Je n\\\'ai pas mon code\')">❌ Pas de code</button>');
+            if (content.includes('statut') || content.includes('dossier')) {
+                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Statut de mon dossier\')">📊 Mon statut</button>');
             }
             
-            if (content.includes('infoconnect') || content.includes('contact')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Comment vous contacter ?\')">📞 Contact</button>');
+            if (content.includes('livraison') || content.includes('transport')) {
+                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Informations livraison\')">🚚 Livraison</button>');
             }
             
-            if (content.includes('Connect 2025') || content.includes('événement')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Informations sur l\\\'événement\')">ℹ️ Infos événement</button>');
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Dates et lieu\')">📅 Dates & lieu</button>');
+            if (content.includes('contact') || content.includes('équipe')) {
+                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contact équipe\')">📞 Contact</button>');
             }
             
             if (actions.length > 0) {
@@ -761,7 +1024,6 @@
             sendButton.disabled = !enabled;
         }
         
-        // Fonction chat principale
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
@@ -848,7 +1110,6 @@
             document.getElementById('equipementsApportes').textContent = data.equipementsApportes;
             document.getElementById('dimensionsEquipements').textContent = data.dimensionsEquipements;
             
-            // Barre de progression
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             progressFill.style.width = data.progression + '%';
@@ -995,7 +1256,6 @@
         function downloadFile(fileId) {
             const file = uploadedFiles.find(f => f.fileId === fileId);
             if (file) {
-                // Créer un lien de téléchargement temporaire
                 const url = URL.createObjectURL(file.originalFile);
                 const a = document.createElement('a');
                 a.href = url;
@@ -1025,9 +1285,7 @@
         
         // Initialisation
         window.addEventListener('load', function() {
-            chatInput.focus();
-            // Charger les données de test
-            loadPartnerData('TEST123');
+            document.getElementById('codeInput').focus();
         });
     </script>
 </body>
