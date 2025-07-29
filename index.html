@@ -51,7 +51,7 @@
             display: flex;
         }
         
-        /* NOUVEAU : Interface admin complète */
+        /* Interface admin complète */
         .admin-container {
             display: none;
             height: calc(100vh - 40px);
@@ -703,16 +703,6 @@
             margin-bottom: 10px;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #E2001A;
-            color: white;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
         .progress-container {
             margin-top: 15px;
         }
@@ -795,17 +785,6 @@
             margin-top: 5px;
             color: #666;
             font-size: 14px;
-        }
-        
-        /* Style spécial pour la deadline urgente */
-        .deadline-urgent {
-            color: #E2001A !important;
-            font-weight: bold;
-        }
-        
-        .deadline-warning {
-            color: #ff8c00 !important;
-            font-weight: bold;
         }
         
         .files-section {
@@ -1089,12 +1068,12 @@
                         <p><strong>Glissez vos fichiers ici</strong></p>
                         <p>ou cliquez pour sélectionner</p>
                         <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                            Formats acceptés: JPG, PNG, GIF, WEBP (max 10MB)
+                            Formats acceptés: .ai (vectoriel) ou PNG CMJN haute définition (max 10MB)
                         </p>
                     </div>
                     
                     <input type="file" id="fileInput" class="file-input" 
-                           accept="image/*" multiple onchange="handleFileSelect(event)">
+                           accept="image/*,.ai" multiple onchange="handleFileSelect(event)">
                     
                     <div class="current-files" id="filesList">
                         <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
@@ -1134,9 +1113,9 @@
         </div>
     </div>
     
-    <!-- NOUVEAU : Interface admin complète -->
+    <!-- Interface admin complète -->
     <div class="admin-container" id="adminContainer">
-        <!-- Header admin MODIFIÉ avec bouton rafraîchir -->
+        <!-- Header admin -->
         <div class="admin-header">
             <div class="admin-title">
                 🛠️ Dashboard Admin - Connect 2025
@@ -1182,7 +1161,7 @@
                 </div>
             </div>
             
-            <!-- Table des partenaires MODIFIÉE avec colonne Actions -->
+            <!-- Table des partenaires -->
             <div class="partners-section">
                 <div class="partners-header">
                     <div class="partners-title">📋 Liste des Partenaires</div>
@@ -1302,6 +1281,7 @@
         let uploadedFiles = [];
         let isExtendedMode = false;
         let allPartnersData = [];
+        let lastBotMessageType = null; // NOUVEAU : Pour détecter le contexte
         
         const API_URL = '/api/dust';
         const ADMIN_CODE = 'EVENT-ADMIN90';
@@ -1311,6 +1291,23 @@
         let chatInput = document.getElementById('chatInput');
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
+        
+        // NOUVEAU : Boutons d'action dynamiques
+        function addActionButtons() {
+            return `
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
+                </div>
+            `;
+        }
         
         // Fonction de formatage des messages
         function formatMessage(content) {
@@ -1562,7 +1559,7 @@
             }
         }
         
-        // NOUVEAU : Gérer la connexion admin
+        // Gérer la connexion admin
         async function handleAdminLogin() {
             setTimeout(async () => {
                 hideTyping();
@@ -1581,7 +1578,7 @@
             }, 1200);
         }
         
-        // NOUVEAU : Afficher l'interface admin
+        // Afficher l'interface admin
         async function showAdminInterface() {
             const chatOnlyContainer = document.getElementById('chatOnlyContainer');
             const adminContainer = document.getElementById('adminContainer');
@@ -1594,7 +1591,7 @@
             await loadAdminData();
         }
         
-        // NOUVEAU : Charger les données admin
+        // Charger les données admin
         async function loadAdminData() {
             try {
                 const response = await fetch(API_URL, {
@@ -1619,7 +1616,7 @@
             }
         }
         
-        // NOUVEAU : Mettre à jour les statistiques
+        // Mettre à jour les statistiques
         function updateAdminStats() {
             const total = allPartnersData.length;
             let complete = 0;
@@ -1648,7 +1645,7 @@
             document.getElementById('incompleteProgress').textContent = `${incompletePercent}%`;
         }
         
-        // MODIFIÉ : Mettre à jour le tableau des partenaires avec bouton supprimer
+        // Mettre à jour le tableau des partenaires avec bouton supprimer
         function updatePartnersTable() {
             const tbody = document.getElementById('partnersTableBody');
             tbody.innerHTML = '';
@@ -1697,14 +1694,14 @@
             });
         }
         
-        // NOUVEAU : Confirmer la suppression d'un partenaire
+        // Confirmer la suppression d'un partenaire
         function confirmDeletePartner(partnerCode, companyName) {
             if (confirm(`Êtes-vous sûr de vouloir supprimer le partenaire :\n\n${companyName} (${partnerCode})\n\nCette action est irréversible !`)) {
                 deletePartner(partnerCode);
             }
         }
         
-        // NOUVEAU : Supprimer un partenaire
+        // Supprimer un partenaire
         async function deletePartner(partnerCode) {
             try {
                 const response = await fetch(API_URL, {
@@ -1733,7 +1730,7 @@
             }
         }
         
-        // NOUVEAU : Forcer le rafraîchissement des données
+        // Forcer le rafraîchissement des données
         async function forceRefreshData() {
             try {
                 // D'abord forcer la sync côté Google Apps Script
@@ -1754,7 +1751,7 @@
             }
         }
         
-        // NOUVEAU : Mettre à jour la liste des destinataires email
+        // Mettre à jour la liste des destinataires email
         function updateEmailRecipients() {
             const select = document.getElementById('emailRecipient');
             select.innerHTML = '<option value="">Sélectionner un partenaire...</option>';
@@ -1773,7 +1770,7 @@
             });
         }
         
-        // NOUVEAU : Filtrer les partenaires
+        // Filtrer les partenaires
         function filterPartners() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const rows = document.querySelectorAll('#partnersTableBody tr');
@@ -1784,24 +1781,24 @@
             });
         }
         
-        // NOUVEAU : Ouvrir modal ajout partenaire
+        // Ouvrir modal ajout partenaire
         function openAddPartnerModal() {
             document.getElementById('addPartnerModal').classList.add('show');
             document.getElementById('newCompanyName').focus();
         }
         
-        // NOUVEAU : Ouvrir modal email
+        // Ouvrir modal email
         function openEmailModal() {
             document.getElementById('emailModal').classList.add('show');
             document.getElementById('emailRecipient').focus();
         }
         
-        // NOUVEAU : Fermer modal
+        // Fermer modal
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('show');
         }
         
-        // NOUVEAU : Gérer l'ajout de partenaire
+        // Gérer l'ajout de partenaire
         document.getElementById('addPartnerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1854,7 +1851,7 @@
             }
         });
         
-        // NOUVEAU : Gérer l'envoi d'email
+        // Gérer l'envoi d'email
         document.getElementById('emailForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1905,7 +1902,7 @@
             }
         });
         
-        // NOUVEAU : Export des données
+        // Export des données
         async function exportData() {
             try {
                 const response = await fetch(API_URL, {
@@ -1933,7 +1930,7 @@
             }
         }
         
-        // NOUVEAU : Convertir en CSV
+        // Convertir en CSV
         function convertToCSV(data) {
             if (!data || data.length === 0) return '';
             
@@ -1951,7 +1948,7 @@
             return [csvHeaders, ...csvRows].join('\n');
         }
         
-        // NOUVEAU : Télécharger CSV
+        // Télécharger CSV
         function downloadCSV(csv, filename) {
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -1967,8 +1964,74 @@
             }
         }
         
-        // Gérer un message normal - MODIFIÉ avec rafraîchissement
+        // NOUVEAU : Détecter l'intention et sauvegarder dans le bon champ
+        async function detectAndSaveField(message, partnerCode, partnerData) {
+            // Détecter selon le type de message précédent ou le contenu
+            if (lastBotMessageType === 'equipements' || message.toLowerCase().includes('équipement')) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Équipements apportés',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'dimensions' || /\d+\s*(m|cm|mm)/i.test(message)) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Dimensions équipements',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'encombrant' || /lourd|encombrant|poids/i.test(message)) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Matériel encombrant',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'livraison' || /\d{1,2}[\/\-]\d{1,2}|septembre|octobre/i.test(message)) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Date livraison souhaitée',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'instructions') {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Instructions livraison spéciales',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'connectivite' || /wifi|internet|réseau|connexion/i.test(message)) {
+                await callGoogleScript('save-field', {
+                    codeUnique: partnerCode,
+                    fieldName: 'Besoins connectivité additionnels',
+                    value: message
+                });
+            } else if (lastBotMessageType === 'contact' || lastBotMessageType === 'equipe') {
+                // Envoyer le message à l'équipe
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'contact-team',
+                        partnerCode: partnerCode,
+                        message: message,
+                        contactName: partnerData['Nom Contact'],
+                        companyName: partnerData['Nom Entreprise']
+                    })
+                });
+            }
+        }
+        
+        // Gérer un message normal - MODIFIÉ avec détection intelligente
         async function handleRegularMessage(message) {
+            // NOUVEAU : Détecter le type de message selon les boutons cliqués
+            if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
+            else if (message === 'Équipements apportés') lastBotMessageType = 'equipements';
+            else if (message === 'Dimensions équipements') lastBotMessageType = 'dimensions';
+            else if (message === 'Matériel encombrant') lastBotMessageType = 'encombrant';
+            else if (message === 'Date livraison') lastBotMessageType = 'livraison';
+            else if (message === 'Instructions livraison') lastBotMessageType = 'instructions';
+            else if (message === 'Besoins connectivité') lastBotMessageType = 'connectivite';
+            else if (message === 'Logos') lastBotMessageType = 'logos';
+            else if (message === 'Contacter équipe') lastBotMessageType = 'contact';
+            
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1977,7 +2040,8 @@
                     message: message,
                     conversationId: currentConversationId,
                     isAuthenticated: isAuthenticated,
-                    partnerCode: currentPartnerCode
+                    partnerCode: currentPartnerCode,
+                    messageType: lastBotMessageType // NOUVEAU : Envoyer le type
                 })
             });
             
@@ -2002,7 +2066,13 @@
                 
                 addMessage(botResponse);
                 
-                // NOUVEAU : Rafraîchir les données après 2 secondes
+                // NOUVEAU : Détecter et sauvegarder si c'est une réponse à une question spécifique
+                if (isAuthenticated && currentPartnerData && lastBotMessageType && 
+                    !['descriptif', 'logos', 'contact'].includes(lastBotMessageType)) {
+                    await detectAndSaveField(message, currentPartnerCode, currentPartnerData);
+                }
+                
+                // Rafraîchir les données après 2 secondes
                 if (isAuthenticated && isExtendedMode) {
                     setTimeout(() => {
                         refreshPartnerData();
@@ -2015,9 +2085,14 @@
             }, 1200);
         }
         
-        // NOUVEAU : Rafraîchir les données après sauvegarde automatique
+        // OPTIMISÉ : Rafraîchissement conditionnel
         async function refreshPartnerData() {
             if (!currentPartnerCode || !isAuthenticated) return;
+            
+            // Éviter les rafraîchissements trop fréquents
+            const now = Date.now();
+            if (window.lastRefresh && (now - window.lastRefresh) < 3000) return; // Max 1 fois par 3s
+            window.lastRefresh = now;
             
             try {
                 const response = await fetch(API_URL, {
@@ -2032,9 +2107,14 @@
                 const result = await response.json();
                 
                 if (result.success && result.data) {
-                    currentPartnerData = result.data;
-                    displayPartnerData(currentPartnerData);
-                    console.log('🔄 Données rafraîchies');
+                    // Vérifier si les données ont changé avant de mettre à jour
+                    const dataString = JSON.stringify(result.data);
+                    if (window.lastDataString !== dataString) {
+                        currentPartnerData = result.data;
+                        displayPartnerData(currentPartnerData);
+                        window.lastDataString = dataString;
+                        console.log('🔄 Données rafraîchies');
+                    }
                 }
                 
             } catch (error) {
@@ -2042,7 +2122,7 @@
             }
         }
         
-        // Afficher l'interface complète
+        // Afficher l'interface complète - MODIFIÉ avec nouveaux boutons
         function showFullInterface() {
             const chatOnlyContainer = document.getElementById('chatOnlyContainer');
             const mainContainer = document.getElementById('mainContainer');
@@ -2059,12 +2139,7 @@
                 <div class="message-bubble">
                     <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
                     <p>Que souhaitez-vous faire ?</p>
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="sendQuickMessage('Soumettre mon logo')">🎨 Soumettre mon logo</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Renseigner mon matériel')">📦 Renseigner mon matériel</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Informations livraison')">🚚 Livraison</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Mon statut')">📊 Mon statut</button>
-                    </div>
+                    ${addActionButtons()}
                 </div>
             `;
             chatMessagesExtended.appendChild(welcomeMessage);
@@ -2100,7 +2175,7 @@
             chatInputExtended.focus();
         }
         
-        // Afficher les données partenaire - MODIFIÉ avec formatage de date
+        // Afficher les données partenaire
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -2118,7 +2193,7 @@
             
             document.getElementById('description').value = data['Descriptif entreprise'] || '';
             
-            // MODIFIÉ : Affichage simplifié
+            // Affichage simplifié
             document.getElementById('equipementsApportes').textContent = data['Équipements apportés'] || '-';
             document.getElementById('dateLivraison').textContent = data['Date livraison souhaitée'] || '-';
             
@@ -2179,7 +2254,8 @@
             } else {
                 // Formater le contenu pour les messages bot
                 const formattedContent = formatMessage(content);
-                const quickActions = addQuickActions(content);
+                // NOUVEAU : Ajouter les boutons d'action après chaque message bot si authentifié
+                const quickActions = isAuthenticated && isExtendedMode ? addActionButtons() : addQuickActions(content);
                 messageDiv.innerHTML = `
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
@@ -2238,7 +2314,7 @@
             currentSendButton.disabled = !enabled;
         }
         
-        // Fonctions upload (simplifiées pour l'instant)
+        // Fonctions upload
         function allowDrop(event) {
             event.preventDefault();
             event.currentTarget.classList.add('dragover');
