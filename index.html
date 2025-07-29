@@ -72,7 +72,7 @@
             overflow: hidden;
         }
         
-        /* Vos styles existants pour le chat */
+        /* Styles chat */
         .chat-header {
             background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
             color: white;
@@ -276,7 +276,7 @@
             transform: none;
         }
         
-        /* Styles pour le panel d'informations (ajoutez vos styles existants) */
+        /* Styles pour le panel d'informations */
         .company-header {
             text-align: center;
             margin-bottom: 30px;
@@ -301,10 +301,210 @@
             font-weight: 500;
         }
         
-        /* Ajoutez tous vos autres styles du panel d'informations ici */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E2001A, #c41e3a);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .info-section {
+            margin-bottom: 25px;
+        }
+        
+        .info-section h3 {
+            color: #E2001A;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .editable-field {
+            width: 100%;
+            min-height: 100px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .editable-field:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #E2001A;
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: #333;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-item .value {
+            margin-top: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .files-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #E2001A;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-zone:hover {
+            background-color: #fff5f5;
+            border-color: #c41e3a;
+        }
+        
+        .upload-zone.dragover {
+            background-color: #fff5f5;
+            border-color: #c41e3a;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #E2001A;
+            margin-bottom: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .current-files {
+            margin-top: 15px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-download {
+            background: #E2001A;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #c41e3a;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .save-indicator.show {
+            opacity: 1;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
+            body { padding: 10px; }
+            
             .main-container.show {
                 flex-direction: column;
             }
@@ -312,6 +512,10 @@
             .info-panel {
                 flex: none;
                 height: 40%;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -366,10 +570,85 @@
             <div class="company-header">
                 <div class="company-name" id="companyName">Chargement...</div>
                 <div class="status-badge" id="statusBadge">En attente</div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0% complété</div>
+                </div>
             </div>
             
-            <!-- Ajoutez ici tous vos éléments du panel d'informations -->
+            <!-- Informations générales -->
+            <div class="info-section">
+                <h3>📋 Informations générales</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Contact</label>
+                        <div class="value" id="nomContact">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Email</label>
+                        <div class="value" id="emailContact">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Téléphone</label>
+                        <div class="value" id="telephone">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Deadline</label>
+                        <div class="value" id="deadline">-</div>
+                    </div>
+                </div>
+            </div>
             
+            <!-- Descriptif modifiable -->
+            <div class="info-section">
+                <h3>📝 Descriptif entreprise</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="description" 
+                    placeholder="Saisissez le descriptif de votre entreprise..."
+                    onblur="saveDescription()">
+                </textarea>
+            </div>
+            
+            <!-- Équipements -->
+            <div class="info-section">
+                <h3>📦 Équipements</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Équipements apportés</label>
+                        <div class="value" id="equipementsApportes">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Dimensions</label>
+                        <div class="value" id="dimensionsEquipements">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fichiers -->
+            <div class="info-section">
+                <h3>📁 Documents et logos</h3>
+                <div class="files-section">
+                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
+                         ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
+                        <div class="upload-icon">📁</div>
+                        <p><strong>Glissez vos fichiers ici</strong></p>
+                        <p>ou cliquez pour sélectionner</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                            Formats acceptés: JPG, PNG, GIF, WEBP (max 10MB)
+                        </p>
+                    </div>
+                    
+                    <input type="file" id="fileInput" class="file-input" 
+                           accept="image/*" multiple onchange="handleFileSelect(event)">
+                    
+                    <div class="current-files" id="filesList">
+                        <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Panel chat étendu -->
@@ -383,6 +662,14 @@
                 <!-- Les messages seront copiés ici -->
             </div>
             
+            <div class="typing-indicator" id="typingIndicatorExtended">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="chatInputExtended" 
                        placeholder="Tapez votre message..." maxlength="500">
@@ -394,29 +681,37 @@
             </div>
         </div>
     </div>
+    
+    <!-- Indicateur de sauvegarde -->
+    <div class="save-indicator" id="saveIndicator">
+        ✅ Sauvegardé automatiquement
+    </div>
 
     <script>
         // Variables globales
         let currentConversationId = null;
         let currentPartnerData = null;
+        let currentPartnerCode = null;
         let isAuthenticated = false;
         let awaitingCode = false;
+        let uploadedFiles = [];
+        let isExtendedMode = false;
         
         const API_URL = '/api/dust';
         
         // Éléments DOM
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
-        const typingIndicator = document.getElementById('typingIndicator');
+        let chatMessages = document.getElementById('chatMessages');
+        let chatInput = document.getElementById('chatInput');
+        let sendButton = document.getElementById('sendButton');
+        let typingIndicator = document.getElementById('typingIndicator');
         
         // Fonction principale d'envoi de message
         async function sendMessage() {
-            const message = chatInput.value.trim();
+            const message = getCurrentInput().value.trim();
             if (!message) return;
             
             addMessage(message, true);
-            chatInput.value = '';
+            getCurrentInput().value = '';
             
             setInputEnabled(false);
             showTyping();
@@ -433,13 +728,25 @@
                 hideTyping();
                 addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
                 setInputEnabled(true);
-                chatInput.focus();
+                getCurrentInput().focus();
             }
+        }
+        
+        // Fonctions utilitaires pour gérer les deux modes
+        function getCurrentInput() {
+            return isExtendedMode ? document.getElementById('chatInputExtended') : chatInput;
+        }
+        
+        function getCurrentMessages() {
+            return isExtendedMode ? document.getElementById('chatMessagesExtended') : chatMessages;
+        }
+        
+        function getCurrentTyping() {
+            return isExtendedMode ? document.getElementById('typingIndicatorExtended') : typingIndicator;
         }
         
         // Vérifier si le message ressemble à un code
         function isLikelyCode(message) {
-            // Code probable si : tout en majuscules, contient des chiffres, longueur 3-20
             return /^[A-Z0-9]{3,20}$/.test(message.toUpperCase());
         }
         
@@ -460,26 +767,24 @@
                 hideTyping();
                 
                 if (result.success) {
-                    // Authentification réussie
                     currentPartnerData = result.partnerData;
+                    currentPartnerCode = code.toUpperCase();
                     isAuthenticated = true;
                     awaitingCode = false;
                     
-                    addMessage(`✅ Parfait ! Bonjour ${result.partnerData.nomContact}. Je vais maintenant afficher votre espace partenaire personnalisé.`);
+                    addMessage(`✅ Parfait ! Bonjour ${result.partnerData['Nom Contact'] || 'Partenaire'}. Je vais maintenant afficher votre espace personnalisé.`);
                     
-                    // Transition vers l'interface complète après 2 secondes
                     setTimeout(() => {
                         showFullInterface();
                     }, 2000);
                     
                 } else {
-                    // Code incorrect
                     addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
                     awaitingCode = true;
                 }
                 
                 setInputEnabled(true);
-                chatInput.focus();
+                getCurrentInput().focus();
             }, 1200);
         }
         
@@ -492,7 +797,8 @@
                     action: 'chat',
                     message: message,
                     conversationId: currentConversationId,
-                    isAuthenticated: isAuthenticated
+                    isAuthenticated: isAuthenticated,
+                    partnerCode: currentPartnerCode
                 })
             });
             
@@ -506,7 +812,6 @@
                 if (data && data.response) {
                     botResponse = data.response.trim();
                     
-                    // Vérifier si le bot demande un code
                     if (botResponse.toLowerCase().includes('code') && !isAuthenticated) {
                         awaitingCode = true;
                     }
@@ -518,7 +823,7 @@
                 
                 addMessage(botResponse);
                 setInputEnabled(true);
-                chatInput.focus();
+                getCurrentInput().focus();
                 
             }, 1200);
         }
@@ -532,18 +837,116 @@
             const chatMessagesExtended = document.getElementById('chatMessagesExtended');
             chatMessagesExtended.innerHTML = chatMessages.innerHTML;
             
+            // Ajouter message de bienvenue dans le mode étendu
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'message bot';
+            welcomeMessage.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="message-bubble">
+                    <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
+                    <p>Vous pouvez maintenant consulter vos informations à gauche et continuer notre conversation ici. Je peux vous aider avec toutes vos questions concernant Connect 2025.</p>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="sendQuickMessage('Statut de mon dossier')">📊 Mon statut</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Informations livraison')">🚚 Livraison</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Contact équipe')">📞 Contact</button>
+                    </div>
+                </div>
+            `;
+            chatMessagesExtended.appendChild(welcomeMessage);
+            
             // Transition
             chatOnlyContainer.style.display = 'none';
             mainContainer.classList.add('show');
+            isExtendedMode = true;
             
             // Remplir le panel d'informations
             displayPartnerData(currentPartnerData);
             
             // Configurer les événements pour le chat étendu
             setupExtendedChat();
+            
+            // Scroll vers le bas
+            chatMessagesExtended.scrollTop = chatMessagesExtended.scrollHeight;
         }
         
-        // Vos autres fonctions existantes...
+        // Configurer le chat étendu
+        function setupExtendedChat() {
+            const chatInputExtended = document.getElementById('chatInputExtended');
+            const sendButtonExtended = document.getElementById('sendButtonExtended');
+            
+            sendButtonExtended.addEventListener('click', sendMessage);
+            chatInputExtended.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            chatInputExtended.focus();
+        }
+        
+        // Afficher les données partenaire
+        function displayPartnerData(data) {
+            if (!data) return;
+            
+            document.getElementById('companyName').textContent = data['Nom Entreprise'] || 'Entreprise';
+            document.getElementById('statusBadge').textContent = data['Statut Global'] || 'En cours';
+            document.getElementById('nomContact').textContent = data['Nom Contact'] || '-';
+            document.getElementById('emailContact').textContent = data['Email Contact'] || '-';
+            document.getElementById('telephone').textContent = data['Téléphone'] || '-';
+            document.getElementById('deadline').textContent = data['Deadline'] || '-';
+            document.getElementById('description').value = data['Descriptif entreprise'] || '';
+            document.getElementById('equipementsApportes').textContent = data['Équipements apportés'] || '-';
+            document.getElementById('dimensionsEquipements').textContent = data['Dimensions équipements'] || '-';
+            
+            // Barre de progression
+            const progression = parseInt(data['Progression %']) || 0;
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = progression + '%';
+            progressText.textContent = progression + '% complété';
+        }
+        
+        // Sauvegarder le descriptif
+        async function saveDescription() {
+            const description = document.getElementById('description').value;
+            
+            if (!currentPartnerCode) {
+                console.log('Aucun code partenaire');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save-description',
+                        codeUnique: currentPartnerCode,
+                        description: description
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSaveIndicator();
+                }
+                
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+            }
+        }
+        
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Fonctions de base
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
@@ -559,12 +962,12 @@
                 `;
             }
             
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            getCurrentMessages().appendChild(messageDiv);
+            getCurrentMessages().scrollTop = getCurrentMessages().scrollHeight;
         }
         
         function sendQuickMessage(message) {
-            chatInput.value = message;
+            getCurrentInput().value = message;
             sendMessage();
         }
         
@@ -575,20 +978,140 @@
         }
         
         function showTyping() {
-            typingIndicator.style.display = 'flex';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            getCurrentTyping().style.display = 'flex';
+            getCurrentMessages().scrollTop = getCurrentMessages().scrollHeight;
         }
         
         function hideTyping() {
-            typingIndicator.style.display = 'none';
+            getCurrentTyping().style.display = 'none';
         }
         
         function setInputEnabled(enabled) {
-            chatInput.disabled = !enabled;
-            sendButton.disabled = !enabled;
+            getCurrentInput().disabled = !enabled;
+            const currentSendButton = isExtendedMode ? 
+                document.getElementById('sendButtonExtended') : sendButton;
+            currentSendButton.disabled = !enabled;
         }
         
-        // Event listeners
+        // Fonctions upload (simplifiées pour l'instant)
+        function allowDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+        
+        function removeDragover(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+        
+        function handleDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            const files = event.dataTransfer.files;
+            processFiles(files);
+        }
+        
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            processFiles(files);
+        }
+        
+        async function processFiles(files) {
+            for (let file of files) {
+                await uploadFile(file);
+            }
+        }
+        
+        async function uploadFile(file) {
+            try {
+                console.log('Upload fichier:', file.name);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'upload-file',
+                        fileName: file.name,
+                        fileSize: file.size,
+                        contentType: file.type,
+                        codeUnique: currentPartnerCode
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadedFiles.push({
+                        ...result.data,
+                        originalFile: file
+                    });
+                    updateFilesList();
+                    showSaveIndicator();
+                } else {
+                    alert('Erreur upload: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erreur upload:', error);
+                alert('Erreur lors de l\'upload du fichier');
+            }
+        }
+        
+        function updateFilesList() {
+            const filesList = document.getElementById('filesList');
+            
+            if (uploadedFiles.length === 0) {
+                filesList.innerHTML = '<p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>';
+                return;
+            }
+            
+            filesList.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${file.fileName}</div>
+                        <div class="file-size">${formatFileSize(file.originalFile.size)}</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn-small btn-download" onclick="downloadFile('${file.fileId}')">
+                            📥 Télécharger
+                        </button>
+                        <button class="btn-small btn-delete" onclick="deleteFile(${index})">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function downloadFile(fileId) {
+            const file = uploadedFiles.find(f => f.fileId === fileId);
+            if (file) {
+                const url = URL.createObjectURL(file.originalFile);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        function deleteFile(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
+                uploadedFiles.splice(index, 1);
+                updateFilesList();
+            }
+        }
+        
+        // Event listeners initiaux
         sendButton.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -600,7 +1123,7 @@
         // Initialisation
         window.addEventListener('load', function() {
             chatInput.focus();
-            awaitingCode = true; // On attend un code dès le début
+            awaitingCode = true;
         });
     </script>
 </body>
