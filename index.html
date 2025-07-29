@@ -751,42 +751,94 @@
         }
         
         // Gérer la soumission d'un code
-        async function handleCodeSubmission(code) {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'authenticate-and-load',
-                    codeUnique: code.toUpperCase()
-                })
-            });
+async function handleCodeSubmission(code) {
+    try {
+        // Étape 1 : Authentifier
+        const authResponse = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'authenticate-and-load',
+                codeUnique: code.toUpperCase()
+            })
+        });
+        
+        const authResult = await authResponse.json();
+        console.log('🔐 Résultat authentification:', authResult);
+        
+        setTimeout(async () => {
+            hideTyping();
             
-            const result = await response.json();
-            
-            setTimeout(() => {
-                hideTyping();
+            if (authResult.success && authResult.partnerData) {
+                // Authentification réussie avec données
+                currentPartnerData = authResult.partnerData;
+                currentPartnerCode = code.toUpperCase();
+                isAuthenticated = true;
+                awaitingCode = false;
                 
-                if (result.success) {
-                    currentPartnerData = result.partnerData;
-                    currentPartnerCode = code.toUpperCase();
-                    isAuthenticated = true;
-                    awaitingCode = false;
+                const contactName = authResult.partnerData['Nom Contact'] || 'Partenaire';
+                addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
+                
+                setTimeout(() => {
+                    showFullInterface();
+                }, 2000);
+                
+            } else if (authResult.success && !authResult.partnerData) {
+                // Authentification OK mais pas de données - on les récupère séparément
+                console.log('🔄 Authentification OK, récupération des données...');
+                
+                try {
+                    const dataResponse = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'get-partner-data',
+                            codeUnique: code.toUpperCase()
+                        })
+                    });
                     
-                    addMessage(`✅ Parfait ! Bonjour ${result.partnerData['Nom Contact'] || 'Partenaire'}. Je vais maintenant afficher votre espace personnalisé.`);
+                    const dataResult = await dataResponse.json();
+                    console.log('📊 Résultat données:', dataResult);
                     
-                    setTimeout(() => {
-                        showFullInterface();
-                    }, 2000);
+                    if (dataResult.success && dataResult.data) {
+                        currentPartnerData = dataResult.data;
+                        currentPartnerCode = code.toUpperCase();
+                        isAuthenticated = true;
+                        awaitingCode = false;
+                        
+                        const contactName = dataResult.data['Nom Contact'] || 'Partenaire';
+                        addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
+                        
+                        setTimeout(() => {
+                            showFullInterface();
+                        }, 2000);
+                    } else {
+                        addMessage("⚠️ Code valide mais impossible de charger vos données. Contactez infoconnect@mbefrance.fr");
+                    }
                     
-                } else {
-                    addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
-                    awaitingCode = true;
+                } catch (dataError) {
+                    console.error('❌ Erreur chargement données:', dataError);
+                    addMessage("⚠️ Code valide mais erreur technique. Contactez infoconnect@mbefrance.fr");
                 }
                 
-                setInputEnabled(true);
-                getCurrentInput().focus();
-            }, 1200);
-        }
+            } else {
+                // Code incorrect
+                addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
+                awaitingCode = true;
+            }
+            
+            setInputEnabled(true);
+            getCurrentInput().focus();
+        }, 1200);
+        
+    } catch (error) {
+        console.error('❌ Erreur authentification:', error);
+        hideTyping();
+        addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
+        setInputEnabled(true);
+        getCurrentInput().focus();
+    }
+}
         
         // Gérer un message normal
         async function handleRegularMessage(message) {
