@@ -1057,6 +1057,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Ateliers et Speedmeeting -->
+            <div class="info-section">
+                <h3>🎓 Ateliers & Speed Meetings</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Atelier</label>
+                        <div class="value" id="atelier">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Speed Meeting</label>
+                        <div class="value" id="speedmeeting">-</div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Fichiers -->
             <div class="info-section">
@@ -2188,6 +2203,8 @@ function addActionButtons() {
             document.getElementById('nomContact').textContent = data['Nom Contact'] || '-';
             document.getElementById('emailContact').textContent = data['Email Contact'] || '-';
             document.getElementById('telephone').textContent = data['Téléphone'] || '-';
+            document.getElementById('atelier').textContent = data['Atelier'] || '-';
+            document.getElementById('speedmeeting').textContent = data['Speedmeeting'] || '-';
             
             // Formatage spécial pour la deadline
             const deadlineElement = document.getElementById('deadline');
