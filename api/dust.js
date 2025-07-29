@@ -17,17 +17,17 @@ export default async function handler(req, res) {
         
         // Router selon l'action
         switch(action) {
+            case 'authenticate-and-load':
+                return handleAuthenticateAndLoad(req, res, otherData);
             case 'chat':
-                return handleChatMessage(req, res, message, conversationId);
+                return handleChatMessage(req, res, message, conversationId, otherData);
             case 'save-description':
                 return handleSaveDescription(req, res, otherData);
-            case 'get-partner-data':
-                return handleGetPartnerData(req, res, otherData);
             case 'upload-file':
                 return handleFileUpload(req, res, otherData);
             default:
-                // Par défaut, traiter comme un message chat (compatibilité avec votre code existant)
-                return handleChatMessage(req, res, message || req.body.message, conversationId);
+                // Par défaut, traiter comme un message chat (compatibilité)
+                return handleChatMessage(req, res, message || req.body.message, conversationId, otherData);
         }
         
     } catch (error) {
@@ -39,15 +39,120 @@ export default async function handler(req, res) {
     }
 }
 
-// Fonction pour gérer les messages chat (votre code existant)
-async function handleChatMessage(req, res, message, conversationId) {
+// URL de votre Google Apps Script
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxna-AtuIKEw8VrvliAOCO2A7T-hd2LohZeNQl5Ai02btqpHL9YgPDQmKLm6YwcQEO/exec';
+
+// Fonction pour appeler Google Apps Script
+async function callGoogleScript(action, data) {
+    try {
+        console.log('📞 Appel Google Script:', action, data);
+        
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: action,
+                ...data
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Réponse Google Script:', result);
+        
+        return result;
+    } catch (error) {
+        console.error('❌ Erreur Google Script:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// NOUVEAU : Authentifier ET charger les données en une fois
+async function handleAuthenticateAndLoad(req, res, data) {
+    const { codeUnique } = data;
+    
+    console.log('🔐 Authentification et chargement pour:', codeUnique);
+    
+    try {
+        // D'abord authentifier
+        const authResult = await callGoogleScript('authenticate', { codeUnique });
+        
+        if (!authResult.success) {
+            return res.status(401).json({
+                success: false,
+                error: authResult.message || 'Code d\'accès incorrect'
+            });
+        }
+        
+        // Ensuite charger les données
+        const dataResult = await callGoogleScript('get-partner-data', { codeUnique });
+        
+        if (!dataResult.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'Erreur lors du chargement des données'
+            });
+        }
+        
+        return res.status(200).json({
+            success: true,
+            message: 'Authentification et chargement réussis',
+            partnerData: dataResult.data
+        });
+        
+    } catch (error) {
+        console.error('❌ Erreur authentification et chargement:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Erreur technique lors de l\'authentification'
+        });
+    }
+}
+
+// Fonction pour gérer les messages chat (votre code existant + améliorations)
+async function handleChatMessage(req, res, message, conversationId, otherData) {
     if (!message) {
         return res.status(400).json({ error: 'Message requis' });
     }
     
+    const { isAuthenticated, partnerCode } = otherData;
+    
     console.log('🔍 ConversationId reçu:', conversationId);
+    console.log('🔐 Authentifié:', isAuthenticated, 'Code:', partnerCode);
     
     let dustUrl, dustPayload;
+    
+    // Enrichir le contexte avec les infos partenaire si authentifié
+    let contextInfo = {
+        username: "connect2025-user",
+        timezone: "Europe/Paris",
+        fullName: "Participant Connect 2025",
+        email: "participant@connect2025.fr",
+        profilePictureUrl: null,
+        origin: "api"
+    };
+    
+    // Si authentifié, enrichir le contexte
+    if (isAuthenticated && partnerCode) {
+        try {
+            const partnerData = await callGoogleScript('get-partner-data', { codeUnique: partnerCode });
+            if (partnerData.success) {
+                contextInfo.fullName = partnerData.data['Nom Contact'] || contextInfo.fullName;
+                contextInfo.email = partnerData.data['Email Contact'] || contextInfo.email;
+                contextInfo.username = `partner-${partnerCode}`;
+                
+                // Ajouter des infos contextuelles au message pour l'IA
+                message = `[CONTEXTE PARTENAIRE: ${partnerData.data['Nom Entreprise']}, Contact: ${partnerData.data['Nom Contact']}, Statut: ${partnerData.data['Statut Global']}] ${message}`;
+            }
+        } catch (error) {
+            console.log('⚠️ Impossible d\'enrichir le contexte:', error.message);
+        }
+    }
     
     if (conversationId && conversationId !== null && conversationId !== 'null') {
         // Continuer une conversation existante
@@ -55,14 +160,7 @@ async function handleChatMessage(req, res, message, conversationId) {
         dustUrl = `https://eu.dust.tt/api/v1/w/v6cPQVVFE1/assistant/conversations/${conversationId}/messages`;
         dustPayload = {
             content: message,
-            context: {
-                username: "connect2025-user",
-                timezone: "Europe/Paris",
-                fullName: "Participant Connect 2025",
-                email: "participant@connect2025.fr",
-                profilePictureUrl: null,
-                origin: "api"
-            },
+            context: contextInfo,
             mentions: [{
                 configurationId: 'Xl8LLukA05'
             }],
@@ -75,19 +173,12 @@ async function handleChatMessage(req, res, message, conversationId) {
         dustPayload = {
             message: {
                 content: message,
-                context: {
-                    username: "connect2025-user",
-                    timezone: "Europe/Paris",
-                    fullName: "Participant Connect 2025",
-                    email: "participant@connect2025.fr",
-                    profilePictureUrl: null,
-                    origin: "api"
-                },
+                context: contextInfo,
                 mentions: [{
                     configurationId: 'Xl8LLukA05'
                 }]
             },
-            title: "Connect 2025 Chat",
+            title: isAuthenticated ? `Connect 2025 - ${partnerCode}` : "Connect 2025 Chat",
             blocking: true
         };
     }
@@ -141,6 +232,9 @@ async function handleChatMessage(req, res, message, conversationId) {
         assistantResponse = data.content.trim();
     }
     
+    // Nettoyer la réponse des infos contextuelles ajoutées
+    assistantResponse = assistantResponse.replace(/\[CONTEXTE PARTENAIRE:.*?\]\s*/g, '');
+    
     console.log('✅ Réponse extraite:', assistantResponse);
     console.log('🆔 ConversationId final:', newConversationId);
     
@@ -151,25 +245,30 @@ async function handleChatMessage(req, res, message, conversationId) {
     });
 }
 
-// NOUVEAU : Fonction pour sauvegarder le descriptif
+// Fonction pour sauvegarder le descriptif
 async function handleSaveDescription(req, res, data) {
     const { codeUnique, description } = data;
     
     console.log('💾 Sauvegarde descriptif:', { codeUnique, description });
     
-    // TODO: Ici vous pourrez connecter à votre vraie base de données
-    // Pour l'instant, on simule la sauvegarde
-    
     try {
-        // Simulation d'une sauvegarde réussie
-        // Dans une vraie implémentation, vous feriez :
-        // await database.updatePartner(codeUnique, { descriptifEntreprise: description });
-        
-        return res.status(200).json({ 
-            success: true,
-            message: 'Descriptif sauvegardé avec succès',
-            timestamp: new Date().toISOString()
+        const result = await callGoogleScript('save-description', {
+            codeUnique,
+            description
         });
+        
+        if (result.success) {
+            return res.status(200).json({
+                success: true,
+                message: 'Descriptif sauvegardé avec succès',
+                timestamp: new Date().toISOString()
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: result.message || 'Erreur lors de la sauvegarde'
+            });
+        }
         
     } catch (error) {
         console.error('❌ Erreur sauvegarde descriptif:', error);
@@ -180,53 +279,7 @@ async function handleSaveDescription(req, res, data) {
     }
 }
 
-// NOUVEAU : Fonction pour récupérer les données partenaire
-async function handleGetPartnerData(req, res, data) {
-    const { codeUnique } = data;
-    
-    console.log('📊 Récupération données pour:', codeUnique);
-    
-    try {
-        // TODO: Ici vous pourrez connecter à votre vraie base de données
-        // const partnerData = await database.getPartnerByCode(codeUnique);
-        
-        // Pour l'instant, données simulées pour test
-        const mockData = {
-            codeUnique: codeUnique,
-            nomEntreprise: "MBE France Partenaire",
-            nomContact: "Jean Dupont",
-            emailContact: "jean.dupont@example.com",
-            telephone: "01 23 45 67 89",
-            descriptifEntreprise: "Entreprise spécialisée dans les solutions digitales innovantes pour les événements professionnels. Nous proposons des services de haute qualité...",
-            equipementsApportes: "Écrans LED, système audio, mobilier",
-            dimensionsEquipements: "3m x 2m x 1.5m",
-            materielEncombrant: "Non",
-            dateLivraisonSouhaitee: "2025-09-25",
-            instructionsLivraisonSpeciales: "Livraison par l'entrée principale",
-            besoinsConnectiviteAdditionnels: "WiFi haut débit, prises électriques",
-            statutGlobal: "En cours",
-            progression: 75,
-            deadline: "2025-09-26",
-            joursRestants: 45,
-            priorite: "Haute",
-            derniereModification: new Date().toISOString()
-        };
-        
-        return res.status(200).json({ 
-            success: true,
-            data: mockData
-        });
-        
-    } catch (error) {
-        console.error('❌ Erreur récupération données:', error);
-        return res.status(500).json({ 
-            success: false,
-            error: 'Erreur lors de la récupération des données'
-        });
-    }
-}
-
-// NOUVEAU : Fonction pour gérer l'upload de fichiers
+// Fonction pour gérer l'upload de fichiers
 async function handleFileUpload(req, res, data) {
     const { fileName, fileSize, contentType, codeUnique } = data;
     
@@ -250,29 +303,44 @@ async function handleFileUpload(req, res, data) {
         }
         
         // Vérifier le type de fichier (images seulement pour les logos)
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedTypes = [
+            'image/jpeg', 
+            'image/jpg', 
+            'image/png', 
+            'image/gif', 
+            'image/webp',
+            'image/svg+xml'
+        ];
+        
         if (!allowedTypes.includes(contentType)) {
             return res.status(400).json({
                 success: false,
-                error: 'Type de fichier non autorisé (images uniquement)'
+                error: 'Type de fichier non autorisé (images uniquement : JPG, PNG, GIF, WEBP, SVG)'
             });
         }
         
-        // TODO: Ici vous pourrez implémenter l'upload vers Dust ou votre stockage
-        // Pour l'instant, on simule un upload réussi
-        
-        const uploadResult = {
-            fileId: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            fileName: fileName,
-            uploadUrl: `https://example.com/upload/${fileName}`, // URL simulée
-            downloadUrl: `https://example.com/files/${fileName}` // URL simulée
-        };
-        
-        return res.status(200).json({
-            success: true,
-            message: 'Fichier uploadé avec succès',
-            data: uploadResult
+        // Appeler Google Apps Script pour gérer l'upload
+        const result = await callGoogleScript('upload-file', {
+            fileName,
+            fileSize,
+            contentType,
+            codeUnique
         });
+        
+        if (result.success) {
+            console.log('✅ Fichier uploadé:', result.data?.fileId);
+            
+            return res.status(200).json({
+                success: true,
+                message: 'Fichier uploadé avec succès',
+                data: result.data
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                error: result.message || 'Erreur lors de l\'upload'
+            });
+        }
         
     } catch (error) {
         console.error('❌ Erreur upload fichier:', error);
@@ -281,4 +349,65 @@ async function handleFileUpload(req, res, data) {
             error: 'Erreur lors de l\'upload du fichier'
         });
     }
+}
+
+// Fonction utilitaire pour formater les dates
+function formatDate(date) {
+    if (!date) return '';
+    
+    try {
+        const d = new Date(date);
+        return d.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    } catch (error) {
+        return date.toString();
+    }
+}
+
+// Fonction utilitaire pour nettoyer les données
+function sanitizeData(data) {
+    if (typeof data !== 'object' || data === null) return data;
+    
+    const sanitized = {};
+    for (const [key, value] of Object.entries(data)) {
+        if (typeof value === 'string') {
+            // Nettoyer les chaînes
+            sanitized[key] = value.trim().replace(/\s+/g, ' ');
+        } else {
+            sanitized[key] = value;
+        }
+    }
+    
+    return sanitized;
+}
+
+// Fonction utilitaire pour logger les erreurs
+function logError(context, error, additionalData = {}) {
+    console.error(`❌ [${context}] ${error.message}`, {
+        error: error.stack,
+        timestamp: new Date().toISOString(),
+        ...additionalData
+    });
+}
+
+// Fonction utilitaire pour valider les codes partenaires
+function isValidPartnerCode(code) {
+    if (!code || typeof code !== 'string') return false;
+    
+    // Code doit faire entre 3 et 20 caractères, lettres et chiffres uniquement
+    return /^[A-Z0-9]{3,20}$/.test(code.toUpperCase());
+}
+
+// Middleware de validation pour les requêtes
+function validateRequest(requiredFields, data) {
+    const missing = requiredFields.filter(field => !data[field]);
+    
+    if (missing.length > 0) {
+        throw new Error(`Champs manquants: ${missing.join(', ')}`);
+    }
+    
+    return true;
 }
