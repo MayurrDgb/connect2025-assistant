@@ -38,7 +38,7 @@
             overflow: hidden;
         }
         
-        /* Interface complète (cachée au début) */
+        /* Interface complète partenaire (cachée au début) */
         .main-container {
             display: none;
             gap: 20px;
@@ -51,7 +51,380 @@
             display: flex;
         }
         
-        /* Panel d'informations */
+        /* NOUVEAU : Interface admin complète */
+        .admin-container {
+            display: none;
+            height: calc(100vh - 40px);
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .admin-container.show {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header admin */
+        .admin-header {
+            background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Dashboard content */
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid #E2001A;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #E2001A;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-progress {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Partners table */
+        .partners-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .partners-header {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .partners-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .search-box {
+            padding: 8px 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+        }
+        
+        .partners-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .partners-table th {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #e1e5e9;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .partners-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        
+        .partners-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-complete { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }
+        .status-incomplete { background: #f8d7da; color: #721c24; }
+        
+        .progress-bar-small {
+            width: 60px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill-small {
+            height: 100%;
+            background: linear-gradient(90deg, #E2001A, #c41e3a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .deadline-urgent {
+            color: #E2001A;
+            font-weight: bold;
+        }
+        
+        .deadline-warning {
+            color: #ff8c00;
+            font-weight: bold;
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            color: #E2001A;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .form-textarea:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        
+        .form-select:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #E2001A;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #c41e3a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Panel d'informations partenaire */
         .info-panel {
             flex: 1;
             background: white;
@@ -551,6 +924,22 @@
             opacity: 1;
         }
         
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #E2001A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -566,6 +955,19 @@
             
             .info-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-btn {
+                justify-content: center;
             }
         }
     </style>
@@ -613,7 +1015,7 @@
         </div>
     </div>
     
-    <!-- Interface complète (cachée au début) -->
+    <!-- Interface complète partenaire (cachée au début) -->
     <div class="main-container" id="mainContainer">
         <!-- Panel d'informations -->
         <div class="info-panel">
@@ -732,6 +1134,154 @@
         </div>
     </div>
     
+    <!-- NOUVEAU : Interface admin complète -->
+    <div class="admin-container" id="adminContainer">
+        <!-- Header admin -->
+        <div class="admin-header">
+            <div class="admin-title">
+                🛠️ Dashboard Admin - Connect 2025
+            </div>
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="openAddPartnerModal()">
+                    <span>➕</span> Ajouter Partenaire
+                </button>
+                <button class="admin-btn" onclick="exportData()">
+                    <span>📥</span> Export CSV
+                </button>
+                <button class="admin-btn" onclick="openEmailModal()">
+                    <span>📧</span> Envoyer Email
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contenu dashboard -->
+        <div class="admin-content">
+            <!-- Stats cards -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPartners">0</div>
+                    <div class="stat-label">Total Partenaires</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completePartners">0</div>
+                    <div class="stat-label">Complets</div>
+                    <div class="stat-progress" id="completeProgress">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="partialPartners">0</div>
+                    <div class="stat-label">Partiels</div>
+                    <div class="stat-progress" id="partialProgress">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="incompletePartners">0</div>
+                    <div class="stat-label">Incomplets</div>
+                    <div class="stat-progress" id="incompleteProgress">0%</div>
+                </div>
+            </div>
+            
+            <!-- Table des partenaires -->
+            <div class="partners-section">
+                <div class="partners-header">
+                    <div class="partners-title">📋 Liste des Partenaires</div>
+                    <input type="text" class="search-box" id="searchBox" 
+                           placeholder="Rechercher un partenaire..." onkeyup="filterPartners()">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="partners-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Entreprise</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Statut</th>
+                                <th>Progression</th>
+                                <th>Deadline</th>
+                                <th>Dernière Modif</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partnersTableBody">
+                            <!-- Les partenaires seront ajoutés ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Ajout Partenaire -->
+    <div class="modal" id="addPartnerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">➕ Ajouter un Nouveau Partenaire</div>
+                <button class="close-btn" onclick="closeModal('addPartnerModal')">&times;</button>
+            </div>
+            <form id="addPartnerForm">
+                <div class="form-group">
+                    <label class="form-label">Nom de l'Entreprise *</label>
+                    <input type="text" class="form-input" id="newCompanyName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nom du Contact *</label>
+                    <input type="text" class="form-input" id="newContactName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email du Contact *</label>
+                    <input type="email" class="form-input" id="newContactEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Téléphone</label>
+                    <input type="tel" class="form-input" id="newContactPhone">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addPartnerModal')">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="addPartnerBtn">
+                        <span class="loading-spinner" id="addPartnerSpinner"></span>
+                        <span id="addPartnerText">Ajouter Partenaire</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Envoi Email -->
+    <div class="modal" id="emailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📧 Envoyer un Email</div>
+                <button class="close-btn" onclick="closeModal('emailModal')">&times;</button>
+            </div>
+            <form id="emailForm">
+                <div class="form-group">
+                    <label class="form-label">Destinataire *</label>
+                    <select class="form-select" id="emailRecipient" required>
+                        <option value="">Sélectionner un partenaire...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Objet de l'Email *</label>
+                    <input type="text" class="form-input" id="emailSubject" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea class="form-textarea" id="emailMessage" required 
+                              placeholder="Tapez votre message ici..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('emailModal')">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="sendEmailBtn">
+                        <span class="loading-spinner" id="sendEmailSpinner"></span>
+                        <span id="sendEmailText">Envoyer Email</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Indicateur de sauvegarde -->
     <div class="save-indicator" id="saveIndicator">
         ✅ Sauvegardé automatiquement
@@ -743,11 +1293,14 @@
         let currentPartnerData = null;
         let currentPartnerCode = null;
         let isAuthenticated = false;
+        let isAdminMode = false;
         let awaitingCode = false;
         let uploadedFiles = [];
         let isExtendedMode = false;
+        let allPartnersData = [];
         
         const API_URL = '/api/dust';
+        const ADMIN_CODE = 'EVENT-ADMIN90';
         
         // Éléments DOM
         let chatMessages = document.getElementById('chatMessages');
@@ -891,14 +1444,14 @@
         // Vérifier si le message contient un code
         function isLikelyCode(message) {
             // Chercher un pattern de code dans le message
-            const codePattern = /\b[A-Z0-9]{3,20}\b/g;
+            const codePattern = /\b[A-Z0-9\-]{3,20}\b/g;
             const matches = message.toUpperCase().match(codePattern);
             
             if (matches) {
                 // Si on trouve des codes potentiels, vérifier s'ils ressemblent à nos codes
                 for (let match of matches) {
-                    // Nos codes contiennent généralement des lettres ET des chiffres
-                    if (/[A-Z]/.test(match) && /[0-9]/.test(match)) {
+                    // Codes partenaires ou admin
+                    if (/[A-Z]/.test(match) && (/[0-9]/.test(match) || match === ADMIN_CODE)) {
                         return match; // Retourner le code trouvé
                     }
                 }
@@ -912,7 +1465,13 @@
             try {
                 console.log('🔐 Code extrait:', code);
                 
-                // Étape 1 : Authentifier avec le code extrait
+                // Vérifier si c'est le code admin
+                if (code === ADMIN_CODE) {
+                    await handleAdminLogin();
+                    return;
+                }
+                
+                // Sinon, traiter comme un code partenaire
                 const authResponse = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -999,7 +1558,350 @@
             }
         }
         
-        // Gérer un message normal
+        // NOUVEAU : Gérer la connexion admin
+        async function handleAdminLogin() {
+            setTimeout(async () => {
+                hideTyping();
+                
+                isAdminMode = true;
+                isAuthenticated = true;
+                awaitingCode = false;
+                
+                addMessage("🛠️ Accès administrateur accordé. Chargement du dashboard...");
+                
+                setTimeout(() => {
+                    showAdminInterface();
+                }, 2000);
+                
+                setInputEnabled(true);
+            }, 1200);
+        }
+        
+        // NOUVEAU : Afficher l'interface admin
+        async function showAdminInterface() {
+            const chatOnlyContainer = document.getElementById('chatOnlyContainer');
+            const adminContainer = document.getElementById('adminContainer');
+            
+            // Transition vers l'interface admin
+            chatOnlyContainer.style.display = 'none';
+            adminContainer.classList.add('show');
+            
+            // Charger les données admin
+            await loadAdminData();
+        }
+        
+        // NOUVEAU : Charger les données admin
+        async function loadAdminData() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get-all-partners'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    allPartnersData = result.data;
+                    updateAdminStats();
+                    updatePartnersTable();
+                    updateEmailRecipients();
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement données admin:', error);
+            }
+        }
+        
+        // NOUVEAU : Mettre à jour les statistiques
+        function updateAdminStats() {
+            const total = allPartnersData.length;
+            let complete = 0;
+            let partial = 0;
+            let incomplete = 0;
+            
+            allPartnersData.forEach(partner => {
+                const status = partner['Statut Global'] || '';
+                if (status.includes('Complet')) complete++;
+                else if (status.includes('Partiel')) partial++;
+                else incomplete++;
+            });
+            
+            document.getElementById('totalPartners').textContent = total;
+            document.getElementById('completePartners').textContent = complete;
+            document.getElementById('partialPartners').textContent = partial;
+            document.getElementById('incompletePartners').textContent = incomplete;
+            
+            // Pourcentages
+            const completePercent = total > 0 ? Math.round((complete / total) * 100) : 0;
+            const partialPercent = total > 0 ? Math.round((partial / total) * 100) : 0;
+            const incompletePercent = total > 0 ? Math.round((incomplete / total) * 100) : 0;
+            
+            document.getElementById('completeProgress').textContent = `${completePercent}%`;
+            document.getElementById('partialProgress').textContent = `${partialPercent}%`;
+            document.getElementById('incompleteProgress').textContent = `${incompletePercent}%`;
+        }
+        
+        // NOUVEAU : Mettre à jour le tableau des partenaires
+        function updatePartnersTable() {
+            const tbody = document.getElementById('partnersTableBody');
+            tbody.innerHTML = '';
+            
+            allPartnersData.forEach(partner => {
+                const row = document.createElement('tr');
+                
+                // Formater le statut
+                const status = partner['Statut Global'] || '🔴 Incomplet';
+                let statusClass = 'status-incomplete';
+                if (status.includes('Complet')) statusClass = 'status-complete';
+                else if (status.includes('Partiel')) statusClass = 'status-partial';
+                
+                // Formater la progression
+                const progression = parseInt(partner['Progression %']) || 0;
+                
+                // Formater la deadline
+                const deadlineInfo = formatDate(partner['Deadline']);
+                
+                // Formater la dernière modification
+                const lastMod = partner['Dernière modification'] ? 
+                    new Date(partner['Dernière modification']).toLocaleDateString('fr-FR') : '-';
+                
+                row.innerHTML = `
+                    <td><strong>${partner['Code Unique']}</strong></td>
+                    <td>${partner['Nom Entreprise'] || '-'}</td>
+                    <td>${partner['Nom Contact'] || '-'}</td>
+                    <td>${partner['Email Contact'] || '-'}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width: ${progression}%"></div>
+                        </div>
+                        <small>${progression}%</small>
+                    </td>
+                    <td class="${deadlineInfo.className}">${deadlineInfo.formatted}</td>
+                    <td>${lastMod}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // NOUVEAU : Mettre à jour la liste des destinataires email
+        function updateEmailRecipients() {
+            const select = document.getElementById('emailRecipient');
+            select.innerHTML = '<option value="">Sélectionner un partenaire...</option>';
+            
+            allPartnersData.forEach(partner => {
+                if (partner['Email Contact']) {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({
+                        email: partner['Email Contact'],
+                        name: partner['Nom Contact'],
+                        company: partner['Nom Entreprise']
+                    });
+                    option.textContent = `${partner['Nom Entreprise']} (${partner['Nom Contact']})`;
+                    select.appendChild(option);
+                }
+            });
+        }
+        
+        // NOUVEAU : Filtrer les partenaires
+        function filterPartners() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#partnersTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+        
+        // NOUVEAU : Ouvrir modal ajout partenaire
+        function openAddPartnerModal() {
+            document.getElementById('addPartnerModal').classList.add('show');
+            document.getElementById('newCompanyName').focus();
+        }
+        
+        // NOUVEAU : Ouvrir modal email
+        function openEmailModal() {
+            document.getElementById('emailModal').classList.add('show');
+            document.getElementById('emailRecipient').focus();
+        }
+        
+        // NOUVEAU : Fermer modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        // NOUVEAU : Gérer l'ajout de partenaire
+        document.getElementById('addPartnerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('addPartnerBtn');
+            const spinner = document.getElementById('addPartnerSpinner');
+            const text = document.getElementById('addPartnerText');
+            
+            // Afficher le loading
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            text.textContent = 'Ajout en cours...';
+            
+            try {
+                const formData = {
+                    companyName: document.getElementById('newCompanyName').value,
+                    contactName: document.getElementById('newContactName').value,
+                    contactEmail: document.getElementById('newContactEmail').value,
+                    contactPhone: document.getElementById('newContactPhone').value
+                };
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'add-partner',
+                        ...formData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Succès
+                    closeModal('addPartnerModal');
+                    document.getElementById('addPartnerForm').reset();
+                    await loadAdminData(); // Recharger les données
+                    showSaveIndicator();
+                } else {
+                    alert('Erreur: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur ajout partenaire:', error);
+                alert('Erreur technique lors de l\'ajout');
+            } finally {
+                // Masquer le loading
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                text.textContent = 'Ajouter Partenaire';
+            }
+        });
+        
+        // NOUVEAU : Gérer l'envoi d'email
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('sendEmailBtn');
+            const spinner = document.getElementById('sendEmailSpinner');
+            const text = document.getElementById('sendEmailText');
+            
+            // Afficher le loading
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            text.textContent = 'Envoi en cours...';
+            
+            try {
+                const recipientData = JSON.parse(document.getElementById('emailRecipient').value);
+                const subject = document.getElementById('emailSubject').value;
+                const message = document.getElementById('emailMessage').value;
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'send-email',
+                        recipient: recipientData,
+                        subject: subject,
+                        message: message
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Succès
+                    closeModal('emailModal');
+                    document.getElementById('emailForm').reset();
+                    showSaveIndicator();
+                } else {
+                    alert('Erreur: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur envoi email:', error);
+                alert('Erreur technique lors de l\'envoi');
+            } finally {
+                // Masquer le loading
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                text.textContent = 'Envoyer Email';
+            }
+        });
+        
+        // NOUVEAU : Export des données
+        async function exportData() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'export-data'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // Créer et télécharger le fichier CSV
+                    const csv = convertToCSV(result.data);
+                    downloadCSV(csv, 'connect2025-partenaires.csv');
+                    showSaveIndicator();
+                } else {
+                    alert('Erreur lors de l\'export');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur export:', error);
+                alert('Erreur technique lors de l\'export');
+            }
+        }
+        
+        // NOUVEAU : Convertir en CSV
+        function convertToCSV(data) {
+            if (!data || data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvHeaders = headers.join(',');
+            
+            const csvRows = data.map(row => {
+                return headers.map(header => {
+                    const value = row[header] || '';
+                    // Échapper les guillemets et entourer de guillemets si nécessaire
+                    return `"${value.toString().replace(/"/g, '""')}"`;
+                }).join(',');
+            });
+            
+            return [csvHeaders, ...csvRows].join('\n');
+        }
+        
+        // NOUVEAU : Télécharger CSV
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // Gérer un message normal - MODIFIÉ avec rafraîchissement
         async function handleRegularMessage(message) {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -1015,7 +1917,7 @@
             
             const data = await response.json();
             
-            setTimeout(() => {
+            setTimeout(async () => {
                 hideTyping();
                 
                 let botResponse = "L'assistant réfléchit...";
@@ -1033,10 +1935,45 @@
                 }
                 
                 addMessage(botResponse);
+                
+                // NOUVEAU : Rafraîchir les données après 2 secondes
+                if (isAuthenticated && isExtendedMode) {
+                    setTimeout(() => {
+                        refreshPartnerData();
+                    }, 2000);
+                }
+                
                 setInputEnabled(true);
                 getCurrentInput().focus();
                 
             }, 1200);
+        }
+        
+        // NOUVEAU : Rafraîchir les données après sauvegarde automatique
+        async function refreshPartnerData() {
+            if (!currentPartnerCode || !isAuthenticated) return;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get-partner-data',
+                        codeUnique: currentPartnerCode
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    currentPartnerData = result.data;
+                    displayPartnerData(currentPartnerData);
+                    console.log('🔄 Données rafraîchies');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur rafraîchissement:', error);
+            }
         }
         
         // Afficher l'interface complète
@@ -1359,6 +2296,13 @@
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
+            }
+        });
+        
+        // Fermer les modals en cliquant à l'extérieur
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
             }
         });
         
