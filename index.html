@@ -424,6 +424,17 @@
             font-size: 14px;
         }
         
+        /* Style spécial pour la deadline urgente */
+        .deadline-urgent {
+            color: #E2001A !important;
+            font-weight: bold;
+        }
+        
+        .deadline-warning {
+            color: #ff8c00 !important;
+            font-weight: bold;
+        }
+        
         .files-section {
             background: #f8f9fa;
             border-radius: 12px;
@@ -791,6 +802,51 @@
             return formatted;
         }
         
+        // Fonction pour formater les dates
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                
+                // Calculer les jours restants
+                const diffTime = date - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Formater la date
+                const formattedDate = date.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                // Ajouter les jours restants avec couleur selon urgence
+                let daysText = '';
+                let className = '';
+                
+                if (diffDays < 0) {
+                    daysText = `(${Math.abs(diffDays)} jours dépassés)`;
+                    className = 'deadline-urgent';
+                } else if (diffDays <= 7) {
+                    daysText = `(${diffDays} jours restants)`;
+                    className = 'deadline-urgent';
+                } else if (diffDays <= 14) {
+                    daysText = `(${diffDays} jours restants)`;
+                    className = 'deadline-warning';
+                } else {
+                    daysText = `(${diffDays} jours restants)`;
+                }
+                
+                return {
+                    formatted: `${formattedDate} ${daysText}`,
+                    className: className
+                };
+            } catch (error) {
+                return { formatted: dateString, className: '' };
+            }
+        }
+        
         // Fonction principale d'envoi de message
         async function sendMessage() {
             const message = getCurrentInput().value.trim();
@@ -992,18 +1048,19 @@
             const chatMessagesExtended = document.getElementById('chatMessagesExtended');
             chatMessagesExtended.innerHTML = chatMessages.innerHTML;
             
-            // Ajouter message de bienvenue dans le mode étendu
+            // Ajouter message de bienvenue dans le mode étendu avec boutons d'action
             const welcomeMessage = document.createElement('div');
             welcomeMessage.className = 'message bot';
             welcomeMessage.innerHTML = `
                 <div class="avatar">🤖</div>
                 <div class="message-bubble">
                     <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
-                    <p>Vous pouvez maintenant consulter vos informations à gauche et continuer notre conversation ici. Je peux vous aider avec toutes vos questions concernant Connect 2025.</p>
+                    <p>Que souhaitez-vous faire ?</p>
                     <div class="quick-actions">
-                        <button class="quick-btn" onclick="sendQuickMessage('Statut de mon dossier')">📊 Mon statut</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Soumettre mon logo')">🎨 Soumettre mon logo</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Renseigner mon matériel')">📦 Renseigner mon matériel</button>
                         <button class="quick-btn" onclick="sendQuickMessage('Informations livraison')">🚚 Livraison</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Contact équipe')">📞 Contact</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Mon statut')">📊 Mon statut</button>
                     </div>
                 </div>
             `;
@@ -1040,7 +1097,7 @@
             chatInputExtended.focus();
         }
         
-        // Afficher les données partenaire - MODIFIÉ
+        // Afficher les données partenaire - MODIFIÉ avec formatage de date
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -1049,7 +1106,13 @@
             document.getElementById('nomContact').textContent = data['Nom Contact'] || '-';
             document.getElementById('emailContact').textContent = data['Email Contact'] || '-';
             document.getElementById('telephone').textContent = data['Téléphone'] || '-';
-            document.getElementById('deadline').textContent = data['Deadline'] || '-';
+            
+            // Formatage spécial pour la deadline
+            const deadlineElement = document.getElementById('deadline');
+            const deadlineInfo = formatDate(data['Deadline']);
+            deadlineElement.textContent = deadlineInfo.formatted;
+            deadlineElement.className = `value ${deadlineInfo.className}`;
+            
             document.getElementById('description').value = data['Descriptif entreprise'] || '';
             
             // MODIFIÉ : Affichage simplifié
