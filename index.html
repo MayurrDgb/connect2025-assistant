@@ -10,19 +10,36 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
-        .chat-container {
-            width: 100%;
-            max-width: 420px;
-            height: 600px;
+        
+        /* NOUVEAU : Container principal à deux panneaux */
+        .main-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 40px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* NOUVEAU : Panel d'informations */
+        .info-panel {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        /* Panel chat (votre code existant adapté) */
+        .chat-panel {
+            flex: 1;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
@@ -30,443 +47,153 @@
             flex-direction: column;
             overflow: hidden;
         }
+        
+        /* Vos styles existants pour le chat */
         .chat-header {
             background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
             color: white;
             padding: 20px;
             text-align: center;
         }
+        
         .chat-header h2 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 5px;
         }
+        
         .chat-header .subtitle {
             font-size: 12px;
             opacity: 0.9;
         }
+        
+        /* NOUVEAU : Styles pour le panel d'informations */
+        .company-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #E2001A;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #E2001A;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .info-section {
+            margin-bottom: 25px;
+        }
+        
+        .info-section h3 {
+            color: #E2001A;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .editable-field {
+            width: 100%;
+            min-height: 100px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .editable-field:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
+        /* Vos styles chat existants (gardez tout le reste) */
         .chat-messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             background: #f8f9fa;
         }
-        .message {
-            margin-bottom: 20px;
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message.bot {
-            display: flex;
-            align-items: flex-start;
-        }
-        .message.user {
-            display: flex;
-            justify-content: flex-end;
-        }
-        .avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #E2001A;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-        .message-bubble {
-            max-width: 75%;
-            padding: 16px 20px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.6;
-            word-wrap: break-word;
-        }
-        .message.bot .message-bubble {
-            background: white;
-            border: 1px solid #e1e5e9;
-            border-bottom-left-radius: 4px;
-        }
-        .message.user .message-bubble {
-            background: #E2001A;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
         
-        /* Formatage du texte dans les messages */
-        .message-bubble p {
-            margin-bottom: 12px;
-        }
-        .message-bubble p:last-child {
-            margin-bottom: 0;
-        }
-        .message-bubble strong {
-            font-weight: 600;
-            color: #E2001A;
-        }
-        .message.user .message-bubble strong {
-            color: white;
-        }
-        .message-bubble ul {
-            margin: 8px 0;
-            padding-left: 20px;
-        }
-        .message-bubble li {
-            margin-bottom: 4px;
-        }
-        .message-bubble a {
-            color: #E2001A;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .message-bubble a:hover {
-            text-decoration: underline;
-        }
-        .message.user .message-bubble a {
-            color: white;
-        }
+        /* ... (gardez tous vos autres styles CSS existants) ... */
         
-        /* Boutons de choix rapides */
-        .quick-actions {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .quick-btn {
-            background: #f8f9fa;
-            border: 1px solid #E2001A;
-            color: #E2001A;
-            padding: 8px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .quick-btn:hover {
-            background: #E2001A;
-            color: white;
-        }
-        
-        .typing-indicator {
-            display: none;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .typing-dots {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            background: white;
-            border: 1px solid #e1e5e9;
-            border-radius: 18px;
-            border-bottom-left-radius: 4px;
-            margin-left: 45px;
-        }
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ccc;
-            margin: 0 2px;
-            animation: typing 1.4s infinite;
-        }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e1e5e9;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .chat-input {
-            flex: 1;
-            border: 1px solid #e1e5e9;
-            border-radius: 25px;
-            padding: 12px 20px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .chat-input:focus {
-            border-color: #E2001A;
-        }
-        .send-button {
-            width: 45px;
-            height: 45px;
-            border: none;
-            border-radius: 50%;
-            background: #E2001A;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        .send-button:hover {
-            background: #c41e3a;
-            transform: scale(1.05);
-        }
-        .send-button:active {
-            transform: scale(0.95);
-        }
-        .send-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-            .chat-container {
-                height: calc(100vh - 20px);
-                border-radius: 15px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>🤖 Assistant Connect 2025</h2>
-            <div class="subtitle">26-28 septembre • Campus de Cély</div>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="avatar">🤖</div>
-                <div class="message-bubble">
-                    <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France pour Connect 2025.</p>
-                    <p>Pour commencer, j'ai besoin de votre <strong>code d'accès unique</strong>.</p>
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="sendQuickMessage('J\'ai mon code')">✅ J'ai mon code</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Je n\'ai pas mon code')">❌ Pas de code</button>
-                        <button class="quick-btn" onclick="sendQuickMessage('Informations sur l\'événement')">ℹ️ Infos événement</button>
-                    </div>
+    <div class="main-container">
+        <!-- NOUVEAU : Panel d'informations -->
+        <div class="info-panel">
+            <div class="company-header">
+                <div class="company-name" id="companyName">Chargement...</div>
+                <div class="status-badge" id="statusBadge">En attente</div>
+            </div>
+            
+            <div class="info-section">
+                <h3>📝 Descriptif entreprise</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="description" 
+                    placeholder="Saisissez le descriptif de votre entreprise..."
+                    onblur="saveDescription()">
+                </textarea>
+            </div>
+            
+            <div class="info-section">
+                <h3>📁 Documents</h3>
+                <div id="filesList">
+                    <p>Aucun fichier pour le moment</p>
                 </div>
             </div>
         </div>
         
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
+        <!-- Panel chat (votre code existant) -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <h2>🤖 Assistant Connect 2025</h2>
+                <div class="subtitle">26-28 septembre • Campus de Cély</div>
             </div>
-        </div>
-        
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="500">
-            <button class="send-button" id="sendButton">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
-                </svg>
-            </button>
+            
+            <!-- Gardez tout votre code chat existant ici -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Votre contenu existant -->
+            </div>
+            
+            <!-- Gardez votre input existant -->
+            <div class="chat-input-container">
+                <!-- Votre code existant -->
+            </div>
         </div>
     </div>
-
-<script>
-const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput');
-const sendButton = document.getElementById('sendButton');
-const typingIndicator = document.getElementById('typingIndicator');
-
-// URL de votre API Vercel
-const API_URL = '/api/dust';
-let currentConversationId = null;
-
-function formatMessage(content) {
-    // Convertir le texte en HTML formaté
-    let formatted = content
-        // Paragraphes (double saut de ligne)
-        .split('\n\n').map(p => p.trim()).filter(p => p).map(p => `<p>${p}</p>`).join('')
-        // Si pas de paragraphes, créer un paragraphe unique
-        || `<p>${content.replace(/\n/g, '<br>')}</p>`;
     
-    // Gras pour les mots importants
-    formatted = formatted
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\b(Connect 2025|MBE France|infoconnect@mbefrance\.fr|Campus de Cély)\b/g, '<strong>$1</strong>');
-    
-    // Liens email
-    formatted = formatted.replace(/(infoconnect@mbefrance\.fr)/g, '<a href="mailto:$1">$1</a>');
-    
-    return formatted;
-}
-
-function addQuickActions(content) {
-    const actions = [];
-    
-    if (content.includes('code d\'accès') || content.includes('code')) {
-        actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'J\\\'ai mon code\')">✅ J\'ai mon code</button>');
-        actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Je n\\\'ai pas mon code\')">❌ Pas de code</button>');
-    }
-    
-    if (content.includes('infoconnect') || content.includes('contact')) {
-        actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Comment vous contacter ?\')">📞 Contact</button>');
-    }
-    
-    if (content.includes('Connect 2025') || content.includes('événement')) {
-        actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Informations sur l\\\'événement\')">ℹ️ Infos événement</button>');
-        actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Dates et lieu\')">📅 Dates & lieu</button>');
-    }
-    
-    if (actions.length > 0) {
-        return `<div class="quick-actions">${actions.join('')}</div>`;
-    }
-    
-    return '';
-}
-
-function addMessage(content, isUser = false) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-    
-    if (isUser) {
-        messageDiv.innerHTML = `<div class="message-bubble"><p>${escapeHtml(content)}</p></div>`;
-    } else {
-        const formattedContent = formatMessage(content);
-        const quickActions = addQuickActions(content);
-        messageDiv.innerHTML = `
-            <div class="avatar">🤖</div>
-            <div class="message-bubble">
-                ${formattedContent}
-                ${quickActions}
-            </div>
-        `;
-    }
-    
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function sendQuickMessage(message) {
-    chatInput.value = message;
-    sendMessage();
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function showTyping() {
-    typingIndicator.style.display = 'flex';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function hideTyping() {
-    typingIndicator.style.display = 'none';
-}
-
-function setInputEnabled(enabled) {
-    chatInput.disabled = !enabled;
-    sendButton.disabled = !enabled;
-}
-
-async function sendMessageToAPI(userMessage) {
-    try {
-        console.log('🚀 Envoi vers API Vercel...');
+    <!-- Gardez tout votre JavaScript existant -->
+    <script>
+        // Vos variables existantes
+        const chatMessages = document.getElementById('chatMessages');
+        // ... etc
         
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: userMessage.trim(),
-                conversationId: currentConversationId
-            })
-        });
-
-        console.log('📡 Status:', response.status);
+        // NOUVEAU : Variables pour le panel d'informations
+        let currentPartnerData = null;
         
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('✅ Réponse API:', data);
-        
-        // Sauvegarder l'ID de conversation
-        if (data.conversationId) {
-            currentConversationId = data.conversationId;
+        // NOUVEAU : Fonction pour sauvegarder le descriptif
+        function saveDescription() {
+            const description = document.getElementById('description').value;
+            console.log('Sauvegarde du descriptif:', description);
+            // On implémentera la sauvegarde dans l'étape suivante
         }
         
-        return data;
-
-    } catch (error) {
-        console.error('❌ Erreur API:', error);
-        throw error;
-    }
-}
-
-async function sendMessage() {
-    const message = chatInput.value.trim();
-    if (!message) return;
-    
-    // Ajouter le message utilisateur
-    addMessage(message, true);
-    chatInput.value = '';
-    
-    // Désactiver l'input et afficher l'indicateur de frappe
-    setInputEnabled(false);
-    showTyping();
-    
-    try {
-        const result = await sendMessageToAPI(message);
-        
-        // Délai pour l'UX
-        setTimeout(() => {
-            hideTyping();
-            
-            let botResponse = "L'assistant réfléchit...";
-            
-            if (result && result.response) {
-                botResponse = result.response.trim();
-            } else if (result && result.error) {
-                botResponse = `Erreur : ${result.error}`;
-            }
-            
-            addMessage(botResponse);
-            setInputEnabled(true);
-            chatInput.focus();
-            
-        }, 1200);
-        
-    } catch (error) {
-        hideTyping();
-        addMessage("❌ Erreur technique. Contactez infoconnect@mbefrance.fr");
-        setInputEnabled(true);
-        chatInput.focus();
-    }
-}
-
-// Event listeners
-sendButton.addEventListener('click', sendMessage);
-chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-    }
-});
-
-// Focus automatique
-chatInput.focus();
-</script>
+        // Gardez tout votre JavaScript existant
+        // ... votre code existant ...
+    </script>
 </body>
 </html>
