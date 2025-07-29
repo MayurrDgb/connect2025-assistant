@@ -93,9 +93,10 @@ async function handleAuthenticateAndLoad(req, res, data) {
         const dataResult = await callGoogleScript('get-partner-data', { codeUnique });
         
         if (!dataResult.success) {
-            return res.status(500).json({
-                success: false,
-                error: 'Erreur lors du chargement des données'
+            return res.status(200).json({
+                success: true,
+                message: 'Authentification réussie mais données non trouvées',
+                partnerData: null
             });
         }
         
