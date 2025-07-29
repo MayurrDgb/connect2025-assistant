@@ -1136,7 +1136,7 @@
     
     <!-- NOUVEAU : Interface admin complète -->
     <div class="admin-container" id="adminContainer">
-        <!-- Header admin -->
+        <!-- Header admin MODIFIÉ avec bouton rafraîchir -->
         <div class="admin-header">
             <div class="admin-title">
                 🛠️ Dashboard Admin - Connect 2025
@@ -1150,6 +1150,9 @@
                 </button>
                 <button class="admin-btn" onclick="openEmailModal()">
                     <span>📧</span> Envoyer Email
+                </button>
+                <button class="admin-btn" onclick="forceRefreshData()">
+                    <span>🔄</span> Rafraîchir
                 </button>
             </div>
         </div>
@@ -1179,7 +1182,7 @@
                 </div>
             </div>
             
-            <!-- Table des partenaires -->
+            <!-- Table des partenaires MODIFIÉE avec colonne Actions -->
             <div class="partners-section">
                 <div class="partners-header">
                     <div class="partners-title">📋 Liste des Partenaires</div>
@@ -1198,6 +1201,7 @@
                                 <th>Progression</th>
                                 <th>Deadline</th>
                                 <th>Dernière Modif</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="partnersTableBody">
@@ -1644,7 +1648,7 @@
             document.getElementById('incompleteProgress').textContent = `${incompletePercent}%`;
         }
         
-        // NOUVEAU : Mettre à jour le tableau des partenaires
+        // MODIFIÉ : Mettre à jour le tableau des partenaires avec bouton supprimer
         function updatePartnersTable() {
             const tbody = document.getElementById('partnersTableBody');
             tbody.innerHTML = '';
@@ -1682,10 +1686,72 @@
                     </td>
                     <td class="${deadlineInfo.className}">${deadlineInfo.formatted}</td>
                     <td>${lastMod}</td>
+                    <td>
+                        <button class="btn-small btn-delete" onclick="confirmDeletePartner('${partner['Code Unique']}', '${partner['Nom Entreprise']}')">
+                            🗑️ Supprimer
+                        </button>
+                    </td>
                 `;
                 
                 tbody.appendChild(row);
             });
+        }
+        
+        // NOUVEAU : Confirmer la suppression d'un partenaire
+        function confirmDeletePartner(partnerCode, companyName) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer le partenaire :\n\n${companyName} (${partnerCode})\n\nCette action est irréversible !`)) {
+                deletePartner(partnerCode);
+            }
+        }
+        
+        // NOUVEAU : Supprimer un partenaire
+        async function deletePartner(partnerCode) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'delete-partner',
+                        partnerCode: partnerCode
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Succès - recharger les données
+                    await loadAdminData();
+                    showSaveIndicator();
+                    alert('Partenaire supprimé avec succès');
+                } else {
+                    alert('Erreur: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur suppression partenaire:', error);
+                alert('Erreur technique lors de la suppression');
+            }
+        }
+        
+        // NOUVEAU : Forcer le rafraîchissement des données
+        async function forceRefreshData() {
+            try {
+                // D'abord forcer la sync côté Google Apps Script
+                const syncResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'force-sync'
+                    })
+                });
+                
+                // Puis recharger les données
+                await loadAdminData();
+                showSaveIndicator();
+                
+            } catch (error) {
+                console.error('❌ Erreur rafraîchissement:', error);
+            }
         }
         
         // NOUVEAU : Mettre à jour la liste des destinataires email
