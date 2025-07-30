@@ -1105,6 +1105,18 @@
                 </textarea>
                 <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
+
+            <!-- NOUVEAU : Régimes alimentaires et allergies -->
+            <div class="info-section">
+                <h3>🍽️ Régimes alimentaires et allergies</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="regimesAllergies" 
+                    placeholder="Indiquez vos régimes alimentaires (végétarien, végan, sans gluten...) et allergies alimentaires..."
+                    onblur="saveField('Régimes alimentaires et allergies', this.value)">
+                </textarea>
+                <div class="optional-note">Informations importantes pour l'organisation des repas</div>
+            </div>
             
             <div class="info-section">
                 <h3>⚡ Speed Meeting</h3>
@@ -2358,6 +2370,7 @@
             document.getElementById('dateLivraison').value = formatDateForInput(data['Date livraison souhaitée']) || '';
             document.getElementById('atelier').value = data['Atelier'] || '';
             document.getElementById('speedmeeting').value = data['Speedmeeting'] || '';
+            document.getElementById('regimesAllergies').value = data['Régimes alimentaires et allergies'] || '';
             
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
