@@ -1358,9 +1358,7 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="section-divider"></div>
-
                 <!-- SECTION 1 : Descriptif entreprise -->
                 <div class="info-section">
                     <h3>📝 Descriptif de votre entreprise</h3>
@@ -1374,7 +1372,6 @@
                     </textarea>
                     <div class="optional-note">💾 Sauvegarde automatique après 2 secondes d'inactivité</div>
                 </div>
-
                 <!-- SECTION 2 : Logistique -->
                 <div class="info-section">
                     <h3>📦 Logistique & Livraison</h3>
@@ -1393,7 +1390,6 @@
                             oninput="markAsModified(this)">
                         </textarea>
                     </div>
-
                     <!-- Date de livraison -->
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
@@ -1411,9 +1407,7 @@
                     </div>
                     <div class="optional-note">💾 Sauvegarde automatique après 2 secondes d'inactivité</div>
                 </div>
-
                 <div class="section-divider"></div>
-
                 <!-- SECTION 3 : Activités Connect 2025 -->
                 <div class="info-section">
                     <h3>🎓 Activités Connect 2025</h3>
@@ -1432,7 +1426,6 @@
                             oninput="markAsModified(this)">
                         </textarea>
                     </div>
-
                     <!-- Speed Meeting -->
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
@@ -1449,9 +1442,7 @@
                     </div>
                     <div class="optional-note">💾 Sauvegarde automatique après 2 secondes d'inactivité</div>
                 </div>
-
                 <div class="section-divider"></div>
-
                 <!-- SECTION 4 : Informations pratiques -->
                 <div class="info-section">
                     <h3>🍽️ Informations pratiques</h3>
@@ -1470,7 +1461,6 @@
                             oninput="markAsModified(this)">
                         </textarea>
                     </div>
-
                     <!-- Tailles t-shirts -->
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
@@ -1487,9 +1477,7 @@
                     </div>
                     <div class="optional-note">💾 Sauvegarde automatique après 2 secondes d'inactivité</div>
                 </div>
-
                 <div class="section-divider"></div>
-
                 <!-- SECTION 5 : Documents et logos -->
                 <div class="info-section">
                     <h3>📁 Documents et logos</h3>
@@ -1702,7 +1690,6 @@
     <button class="floating-chat-btn" id="floatingChatBtn" onclick="toggleMobileChat()">
         💬
     </button>
-
     <!-- Modal chat mobile -->
     <div class="mobile-chat-modal" id="mobileChatModal">
         <div class="mobile-chat-content">
@@ -1736,9 +1723,8 @@
     <div class="save-indicator" id="saveIndicator">
         ✅ Sauvegardé automatiquement
     </div>
-
     <script>
-        // Variables globales
+        // Variables globales - CORRECTION : Maintenir l'état d'authentification
         let currentConversationId = null;
         let currentPartnerData = null;
         let currentPartnerCode = null;
@@ -1758,6 +1744,9 @@
         let chatInput = document.getElementById('chatInput');
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
+        
+        // CORRECTION : Prompt optimisé intégré dans le contexte
+        const PROMPT_REMINDER = "RAPPEL IMPORTANT: Sois CONCIS (max 2-3 lignes), ENCOURAGEANT, utilise les BOUTONS D'ACTION. Toujours encourager le remplissage du formulaire à gauche. Pas de longs textes.";
         
         // Boutons d'action avec nouveau champ tailles t-shirts
         function addActionButtons() {
@@ -2025,7 +2014,6 @@
                 openMobileChat();
             }
         }
-
         function openMobileChat() {
             const modal = document.getElementById('mobileChatModal');
             const btn = document.getElementById('floatingChatBtn');
@@ -2048,7 +2036,6 @@
                 mobileChatMessages.scrollTop = mobileChatMessages.scrollHeight;
             }, 100);
         }
-
         function closeMobileChat() {
             const modal = document.getElementById('mobileChatModal');
             const btn = document.getElementById('floatingChatBtn');
@@ -2056,7 +2043,6 @@
             modal.classList.remove('show');
             btn.classList.remove('active');
         }
-
         function setupMobileChatEvents() {
             const input = document.getElementById('mobileChatInput');
             const sendBtn = document.getElementById('mobileChatSend');
@@ -2080,7 +2066,6 @@
                 }
             });
         }
-
         function sendMobileMessage() {
             const input = document.getElementById('mobileChatInput');
             const message = input.value.trim();
@@ -2100,12 +2085,10 @@
                 closeMobileChat();
             }, 500);
         }
-
         // Détecter si on est sur mobile
         function isMobile() {
             return window.innerWidth <= 768;
         }
-
         // Adapter l'interface selon la taille d'écran
         function adaptInterface() {
             if (isMobile() && isExtendedMode) {
@@ -2116,10 +2099,8 @@
                 document.getElementById('floatingChatBtn').style.display = 'none';
             }
         }
-
         // Écouter les changements de taille d'écran
         window.addEventListener('resize', adaptInterface);
-
         // Adapter l'interface au chargement
         window.addEventListener('load', adaptInterface);
         
@@ -2236,10 +2217,18 @@
             }
         }
         
-        // Fonction principale d'envoi de message
+        // Fonction principale d'envoi de message - CORRECTION MAJEURE
         async function sendMessage() {
             const message = getCurrentInput().value.trim();
             if (!message) return;
+            
+            // CORRECTION : Logs pour déboguer l'état d'authentification
+            console.log('🔐 État avant envoi:', {
+                isAuthenticated,
+                currentPartnerCode,
+                awaitingCode,
+                conversationId: currentConversationId
+            });
             
             addMessage(message, true);
             getCurrentInput().value = '';
@@ -2296,7 +2285,7 @@
             return false;
         }
         
-        // Gérer la soumission d'un code
+        // Gérer la soumission d'un code - CORRECTION MAJEURE
         async function handleCodeSubmission(code) {
             try {
                 console.log('🔐 Code extrait:', code);
@@ -2324,11 +2313,18 @@
                     hideTyping();
                     
                     if (authResult.success && authResult.partnerData) {
-                        // Authentification réussie avec données
+                        // CORRECTION : Bien définir l'état d'authentification
                         currentPartnerData = authResult.partnerData;
                         currentPartnerCode = code.toString().toUpperCase();
-                        isAuthenticated = true;
-                        awaitingCode = false;
+                        isAuthenticated = true;  // ← IMPORTANT : Définir à true
+                        awaitingCode = false;    // ← IMPORTANT : Plus d'attente de code
+                        
+                        // CORRECTION : Logs pour confirmer l'état
+                        console.log('🔐 État après authentification réussie:', {
+                            isAuthenticated,
+                            currentPartnerCode,
+                            awaitingCode
+                        });
                         
                         const contactName = authResult.partnerData['Nom Contact'] || 'Partenaire';
                         addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
@@ -2355,10 +2351,18 @@
                             console.log('📊 Résultat données:', dataResult);
                             
                             if (dataResult.success && dataResult.data) {
+                                // CORRECTION : Bien définir l'état d'authentification
                                 currentPartnerData = dataResult.data;
                                 currentPartnerCode = code.toString().toUpperCase();
-                                isAuthenticated = true;
-                                awaitingCode = false;
+                                isAuthenticated = true;  // ← IMPORTANT : Définir à true
+                                awaitingCode = false;    // ← IMPORTANT : Plus d'attente de code
+                                
+                                // CORRECTION : Logs pour confirmer l'état
+                                console.log('🔐 État après récupération données:', {
+                                    isAuthenticated,
+                                    currentPartnerCode,
+                                    awaitingCode
+                                });
                                 
                                 const contactName = dataResult.data['Nom Contact'] || 'Partenaire';
                                 addMessage(`✅ Parfait ! Bonjour ${contactName}. Je vais maintenant afficher votre espace personnalisé.`);
@@ -2376,9 +2380,9 @@
                         }
                         
                     } else {
-                        // Code incorrect
+                        // Code incorrect - GARDER l'état d'attente
                         addMessage("❌ Ce code n'est pas valide. Pouvez-vous vérifier et ressayer ? Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr");
-                        awaitingCode = true;
+                        awaitingCode = true;  // ← Continuer à attendre un code
                     }
                     
                     setInputEnabled(true);
@@ -2801,6 +2805,13 @@
         
         // Détecter les nouveaux types de messages avec contact équipe simplifié
         async function handleRegularMessage(message) {
+            // CORRECTION : Logs pour vérifier l'état avant envoi
+            console.log('📤 Envoi message régulier. État:', {
+                isAuthenticated,
+                currentPartnerCode,
+                awaitingCode
+            });
+            
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
             else if (message === 'Équipements apportés') lastBotMessageType = 'equipements';
@@ -2840,12 +2851,32 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 return;
             }
             
+            // CORRECTION : Enrichir le message avec le prompt et les infos partenaire
+            let enrichedMessage = message;
+            
+            if (isAuthenticated && currentPartnerCode) {
+                try {
+                    const partnerData = await callGoogleScript('get-partner-data', { codeUnique: currentPartnerCode });
+                    if (partnerData.success) {
+                        // CORRECTION : Ajouter le prompt reminder au début
+                        enrichedMessage = `${PROMPT_REMINDER} [PARTENAIRE: ${partnerData.data['Nom Entreprise']}, Statut: ${partnerData.data['Statut Global']}, Progression: ${partnerData.data['Progression %']}%] ${message}`;
+                    }
+                } catch (error) {
+                    console.log('⚠️ Impossible d\'enrichir le contexte:', error.message);
+                    // CORRECTION : Au minimum, ajouter le prompt reminder
+                    enrichedMessage = `${PROMPT_REMINDER} ${message}`;
+                }
+            } else {
+                // CORRECTION : Même non authentifié, ajouter le prompt reminder
+                enrichedMessage = `${PROMPT_REMINDER} ${message}`;
+            }
+            
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'chat',
-                    message: message,
+                    message: enrichedMessage,  // ← Utiliser le message enrichi
                     conversationId: currentConversationId,
                     isAuthenticated: isAuthenticated,
                     partnerCode: currentPartnerCode,
@@ -2862,6 +2893,12 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 
                 if (data && data.response) {
                     botResponse = data.response.trim();
+                    
+                    // CORRECTION : Vérifier si le bot redemande le code alors qu'on est authentifié
+                    if (botResponse.toLowerCase().includes('code') && isAuthenticated) {
+                        console.warn('⚠️ Le bot redemande le code alors qu\'on est authentifié !');
+                        console.log('État actuel:', { isAuthenticated, currentPartnerCode, awaitingCode });
+                    }
                     
                     if (botResponse.toLowerCase().includes('code') && !isAuthenticated) {
                         awaitingCode = true;
@@ -2885,6 +2922,31 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 getCurrentInput().focus();
                 
             }, 1200);
+        }
+        
+        // CORRECTION : Fonction pour appeler Google Script (manquante)
+        async function callGoogleScript(action, data) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                return result;
+                
+            } catch (error) {
+                console.error('❌ Erreur Google Script:', error);
+                return { success: false, error: error.message };
+            }
         }
         
         // Rafraîchissement plus intelligent
@@ -3074,8 +3136,18 @@ L'équipe vous répondra dans les plus brefs délais !`);
             }
         }
         
-        // Fonction addMessage avec boutons contextuels
+        // Fonction addMessage avec boutons contextuels - CORRECTION : Logs pour déboguer
         function addMessage(content, isUser = false) {
+            // CORRECTION : Logs pour vérifier l'état à chaque message
+            if (!isUser) {
+                console.log('🤖 État lors ajout message bot:', {
+                    isAuthenticated,
+                    currentPartnerCode,
+                    awaitingCode,
+                    conversationId: currentConversationId
+                });
+            }
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
             
