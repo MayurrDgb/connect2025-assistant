@@ -534,31 +534,26 @@
             margin: 10px 0 8px 0;
             font-weight: 600;
         }
-
         .message-bubble h3 {
             font-size: 15px;
             color: #E2001A;
             margin: 8px 0 6px 0;
             font-weight: 600;
         }
-
         .message-bubble h4 {
             font-size: 14px;
             color: #333;
             margin: 6px 0 4px 0;
             font-weight: 600;
         }
-
         .message-bubble ul {
             margin: 8px 0;
             padding-left: 20px;
         }
-
         .message-bubble li {
             margin-bottom: 4px;
             line-height: 1.4;
         }
-
         .emoji-bullet {
             font-size: 16px;
             margin-right: 5px;
@@ -759,6 +754,21 @@
             outline: none;
         }
         
+        /* NOUVEAU : Style pour les champs éditables courts */
+        .editable-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .editable-input:focus {
+            border-color: #E2001A;
+            outline: none;
+        }
+        
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -787,7 +797,7 @@
             font-size: 14px;
         }
         
-        /* NOUVEAU : Style pour les notes optionnelles */
+        /* Style pour les notes optionnelles */
         .optional-note {
             font-size: 11px;
             color: #888;
@@ -982,8 +992,8 @@
                         <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France pour Connect 2025.</p>
                         <p>Pour commencer, j'ai besoin de votre <strong>code d'accès unique</strong>.</p>
                         <div class="quick-actions">
-                            <button class="quick-btn" onclick="sendQuickMessage('J\'ai mon code')">✅ J'ai mon code</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Je n\'ai pas mon code')">❌ Pas de code</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('J\\'ai mon code')">✅ J'ai mon code</button>
+                            <button class="quick-btn" onclick="sendQuickMessage('Je n\\'ai pas mon code')">❌ Pas de code</button>
                         </div>
                     </div>
                 </div>
@@ -1058,37 +1068,49 @@
                 </textarea>
             </div>
             
-            <!-- Équipements - SIMPLIFIÉ -->
+            <!-- MODIFIÉ : Équipements/matériels à livrer - ÉDITABLE -->
             <div class="info-section">
-                <h3>📦 Livraison</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Équipements/matériels à livrer</label>
-                        <div class="value" id="equipementsApportes">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Date de livraison prévue</label>
-                        <div class="value" id="dateLivraison">-</div>
-                    </div>
-                </div>
+                <h3>📦 Équipements/matériels à livrer</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="equipements" 
+                    placeholder="Décrivez les équipements à livrer (affiches, livres, matériel, etc.)..."
+                    onblur="saveField('Équipements apportés', this.value)">
+                </textarea>
             </div>
             
-            <!-- NOUVEAU : Ateliers & Speed Meetings -->
+            <!-- MODIFIÉ : Date de livraison prévue - ÉDITABLE -->
             <div class="info-section">
-                <h3>🎓 Ateliers & Speed Meetings</h3>
-                <div class="optional-note">Si vous avez pris l'option</div>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Atelier</label>
-                        <div class="value" id="atelier">-</div>
-                        <div class="optional-note">Thématique et descriptif</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Speed Meeting</label>
-                        <div class="value" id="speedmeeting">-</div>
-                        <div class="optional-note">Thématique et descriptif</div>
-                    </div>
-                </div>
+                <h3>📅 Date de livraison prévue</h3>
+                <input 
+                    type="date" 
+                    class="editable-input" 
+                    id="dateLivraison" 
+                    onchange="saveField('Date livraison souhaitée', this.value)">
+                <div class="optional-note">Choisissez votre date de livraison préférée</div>
+            </div>
+            
+            <!-- NOUVEAU : Ateliers & Speed Meetings - ÉDITABLES -->
+            <div class="info-section">
+                <h3>🎓 Atelier</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="atelier" 
+                    placeholder="Si vous avez pris l'option atelier, décrivez la thématique et le contenu..."
+                    onblur="saveField('Atelier', this.value)">
+                </textarea>
+                <div class="optional-note">Uniquement si vous avez pris l'option</div>
+            </div>
+            
+            <div class="info-section">
+                <h3>⚡ Speed Meeting</h3>
+                <textarea 
+                    class="editable-field" 
+                    id="speedmeeting" 
+                    placeholder="Si vous avez pris l'option speed meeting, décrivez la thématique et le contenu..."
+                    onblur="saveField('Speedmeeting', this.value)">
+                </textarea>
+                <div class="optional-note">Uniquement si vous avez pris l'option</div>
             </div>
             
             <!-- Fichiers -->
@@ -1101,12 +1123,12 @@
                         <p><strong>Glissez vos fichiers ici</strong></p>
                         <p>ou cliquez pour sélectionner</p>
                         <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                            Formats acceptés: .ai (vectoriel) ou PNG CMJN haute définition (max 10MB)
+                            Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
                         </p>
                     </div>
                     
                     <input type="file" id="fileInput" class="file-input" 
-                           accept="image/*,.ai" multiple onchange="handleFileSelect(event)">
+                           accept="image/*,.ai,.pdf,.doc,.docx" multiple onchange="handleFileSelect(event)">
                     
                     <div class="current-files" id="filesList">
                         <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
@@ -1325,23 +1347,71 @@
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
         
-        // MODIFIÉ : Boutons d'action avec les nouveaux champs
+        // Boutons d'action avec les nouveaux champs
         function addActionButtons() {
             return `
                 <div class="quick-actions">
                     <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
-                    <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
                 </div>
             `;
+        }
+        
+        // NOUVEAU : Fonction générique pour sauvegarder un champ
+        async function saveField(fieldName, value) {
+            if (!currentPartnerCode || !value || !value.trim()) return;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save-field',
+                        codeUnique: currentPartnerCode,
+                        fieldName: fieldName,
+                        value: value.trim()
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSaveIndicator();
+                    // Rafraîchir les données après sauvegarde
+                    setTimeout(() => {
+                        refreshPartnerData();
+                    }, 1000);
+                }
+                
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+            }
+        }
+        
+        // Fonction utilitaire pour formater les dates pour les inputs
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            try {
+                // Si c'est déjà au format YYYY-MM-DD, le retourner tel quel
+                if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                    return dateString;
+                }
+                
+                // Sinon, essayer de parser et formater
+                const date = new Date(dateString);
+                if (!isNaN(date.getTime())) {
+                    return date.toISOString().split('T')[0];
+                }
+                
+                return '';
+            } catch {
+                return '';
+            }
         }
         
         // Fonction de formatage des messages
@@ -1355,7 +1425,7 @@
                 .replace(/## (.*?)$/gm, '<h3>$1</h3>')
                 .replace(/# (.*?)$/gm, '<h2>$1</h2>')
                 // Remplacer les listes
-                .replace(/^\- (.*?)$/gm, '<li>$1</li>')
+                .replace(/^- (.*?)$/gm, '<li>$1</li>')
                 .replace(/^\d+\. (.*?)$/gm, '<li>$1</li>')
                 // Nettoyer les citations :cite[xx]
                 .replace(/:cite\[[^\]]+\]/g, '')
@@ -1999,18 +2069,14 @@
             }
         }
         
-        // MODIFIÉ : Détecter les nouveaux types de messages
+        // Détecter les nouveaux types de messages
         async function handleRegularMessage(message) {
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
             else if (message === 'Équipements apportés') lastBotMessageType = 'equipements';
-            else if (message === 'Dimensions équipements') lastBotMessageType = 'dimensions';
-            else if (message === 'Matériel encombrant') lastBotMessageType = 'encombrant';
             else if (message === 'Date livraison') lastBotMessageType = 'livraison';
-            else if (message === 'Instructions livraison') lastBotMessageType = 'instructions';
-            else if (message === 'Besoins connectivité') lastBotMessageType = 'connectivite';
-            else if (message === 'Atelier') lastBotMessageType = 'atelier'; // NOUVEAU
-            else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting'; // NOUVEAU
+            else if (message === 'Atelier') lastBotMessageType = 'atelier';
+            else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting';
             else if (message === 'Logos') lastBotMessageType = 'logos';
             else if (message === 'Contacter équipe') lastBotMessageType = 'contact';
             
@@ -2061,7 +2127,7 @@
             }, 1200);
         }
         
-        // OPTIMISÉ : Rafraîchissement conditionnel
+        // Rafraîchissement conditionnel
         async function refreshPartnerData() {
             if (!currentPartnerCode || !isAuthenticated) return;
             
@@ -2098,7 +2164,7 @@
             }
         }
         
-        // Afficher l'interface complète - MODIFIÉ avec nouveaux boutons
+        // Afficher l'interface complète avec nouveaux boutons
         function showFullInterface() {
             const chatOnlyContainer = document.getElementById('chatOnlyContainer');
             const mainContainer = document.getElementById('mainContainer');
@@ -2114,7 +2180,7 @@
                 <div class="avatar">🤖</div>
                 <div class="message-bubble">
                     <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
-                    <p>Que souhaitez-vous faire ?</p>
+                    <p>Vous pouvez maintenant modifier directement vos informations dans le panneau de gauche ou me poser des questions.</p>
                     ${addActionButtons()}
                 </div>
             `;
@@ -2154,7 +2220,7 @@
             chatInputExtended.focus();
         }
         
-        // MODIFIÉ : Afficher les données partenaire avec nouveaux champs
+        // MODIFIÉ : Afficher les données partenaire avec nouveaux champs éditables
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -2170,15 +2236,12 @@
             deadlineElement.textContent = deadlineInfo.formatted;
             deadlineElement.className = `value ${deadlineInfo.className}`;
             
+            // Remplir les champs éditables
             document.getElementById('description').value = data['Descriptif entreprise'] || '';
-            
-            // Affichage simplifié
-            document.getElementById('equipementsApportes').textContent = data['Équipements apportés'] || '-';
-            document.getElementById('dateLivraison').textContent = data['Date livraison souhaitée'] || '-';
-            
-            // NOUVEAU : Afficher les nouveaux champs
-            document.getElementById('atelier').textContent = data['Atelier'] || '-';
-            document.getElementById('speedmeeting').textContent = data['Speedmeeting'] || '-';
+            document.getElementById('equipements').value = data['Équipements apportés'] || '';
+            document.getElementById('dateLivraison').value = formatDateForInput(data['Date livraison souhaitée']) || '';
+            document.getElementById('atelier').value = data['Atelier'] || '';
+            document.getElementById('speedmeeting').value = data['Speedmeeting'] || '';
             
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
@@ -2297,7 +2360,7 @@
             currentSendButton.disabled = !enabled;
         }
         
-        // NOUVEAU : Charger les fichiers existants
+        // Charger les fichiers existants
         async function loadExistingFiles() {
             if (!currentPartnerCode) return;
             
@@ -2351,7 +2414,7 @@
             }
         }
         
-        // NOUVEAU : Détecter le type de logo
+        // Détecter le type de logo
         function detectLogoType(fileName) {
             const name = fileName.toLowerCase();
             
@@ -2365,7 +2428,7 @@
             return null;
         }
         
-        // MODIFIÉ : Upload avec détection de type et stockage Drive
+        // Upload avec détection de type et stockage Drive
         async function uploadFile(file) {
             try {
                 console.log('Upload fichier:', file.name);
@@ -2426,7 +2489,7 @@
             }
         }
         
-        // NOUVEAU : Convertir fichier en base64
+        // Convertir fichier en base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2436,7 +2499,7 @@
             });
         }
         
-        // MODIFIÉ : Afficher les fichiers avec type de logo
+        // Afficher les fichiers avec type de logo
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
@@ -2472,7 +2535,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
-        // MODIFIÉ : Télécharger depuis Drive
+        // Télécharger depuis Drive
         async function downloadFile(fileId) {
             try {
                 const response = await fetch(API_URL, {
@@ -2499,7 +2562,7 @@
             }
         }
         
-        // MODIFIÉ : Supprimer fichier du Drive et du Sheet
+        // Supprimer fichier du Drive et du Sheet
         async function deleteFile(index) {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
                 const file = uploadedFiles[index];
