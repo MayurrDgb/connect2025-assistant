@@ -787,6 +787,14 @@
             font-size: 14px;
         }
         
+        /* NOUVEAU : Style pour les notes optionnelles */
+        .optional-note {
+            font-size: 11px;
+            color: #888;
+            font-style: italic;
+            margin-top: 2px;
+        }
+        
         .files-section {
             background: #f8f9fa;
             border-radius: 12px;
@@ -851,6 +859,13 @@
         .file-size {
             font-size: 12px;
             color: #666;
+        }
+        
+        .file-type {
+            font-size: 11px;
+            color: #E2001A;
+            font-weight: 600;
+            margin-top: 2px;
         }
         
         .file-actions {
@@ -1057,18 +1072,21 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Ateliers et Speedmeeting -->
+            
+            <!-- NOUVEAU : Ateliers & Speed Meetings -->
             <div class="info-section">
                 <h3>🎓 Ateliers & Speed Meetings</h3>
+                <div class="optional-note">Si vous avez pris l'option</div>
                 <div class="info-grid">
                     <div class="info-item">
                         <label>Atelier</label>
                         <div class="value" id="atelier">-</div>
+                        <div class="optional-note">Thématique et descriptif</div>
                     </div>
                     <div class="info-item">
                         <label>Speed Meeting</label>
                         <div class="value" id="speedmeeting">-</div>
+                        <div class="optional-note">Thématique et descriptif</div>
                     </div>
                 </div>
             </div>
@@ -1296,7 +1314,7 @@
         let uploadedFiles = [];
         let isExtendedMode = false;
         let allPartnersData = [];
-        let lastBotMessageType = null; // NOUVEAU : Pour détecter le contexte
+        let lastBotMessageType = null;
         
         const API_URL = '/api/dust';
         const ADMIN_CODE = 'EVENT-ADMIN90';
@@ -1308,23 +1326,23 @@
         let typingIndicator = document.getElementById('typingIndicator');
         
         // MODIFIÉ : Boutons d'action avec les nouveaux champs
-function addActionButtons() {
-    return `
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
-            <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
-        </div>
-    `;
-}
+        function addActionButtons() {
+            return `
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="sendQuickMessage('Descriptif entreprise')">📝 Descriptif</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Équipements apportés')">📦 Équipements</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Dimensions équipements')">📏 Dimensions</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Matériel encombrant')">🚛 Matériel lourd</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Instructions livraison')">📋 Instructions</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Besoins connectivité')">🌐 Connectivité</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
+                </div>
+            `;
+        }
         
         // Fonction de formatage des messages
         function formatMessage(content) {
@@ -1981,62 +1999,7 @@ function addActionButtons() {
             }
         }
         
-        // NOUVEAU : Détecter l'intention et sauvegarder dans le bon champ
-        async function detectAndSaveField(message, partnerCode, partnerData) {
-            // Détecter selon le type de message précédent ou le contenu
-            if (lastBotMessageType === 'equipements' || message.toLowerCase().includes('équipement')) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Équipements apportés',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'dimensions' || /\d+\s*(m|cm|mm)/i.test(message)) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Dimensions équipements',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'encombrant' || /lourd|encombrant|poids/i.test(message)) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Matériel encombrant',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'livraison' || /\d{1,2}[\/\-]\d{1,2}|septembre|octobre/i.test(message)) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Date livraison souhaitée',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'instructions') {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Instructions livraison spéciales',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'connectivite' || /wifi|internet|réseau|connexion/i.test(message)) {
-                await callGoogleScript('save-field', {
-                    codeUnique: partnerCode,
-                    fieldName: 'Besoins connectivité additionnels',
-                    value: message
-                });
-            } else if (lastBotMessageType === 'contact' || lastBotMessageType === 'equipe') {
-                // Envoyer le message à l'équipe
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'contact-team',
-                        partnerCode: partnerCode,
-                        message: message,
-                        contactName: partnerData['Nom Contact'],
-                        companyName: partnerData['Nom Entreprise']
-                    })
-                });
-            }
-        }
-        
-        // Gérer un message normal - MODIFIÉ avec détection intelligente
+        // MODIFIÉ : Détecter les nouveaux types de messages
         async function handleRegularMessage(message) {
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
@@ -2060,7 +2023,7 @@ function addActionButtons() {
                     conversationId: currentConversationId,
                     isAuthenticated: isAuthenticated,
                     partnerCode: currentPartnerCode,
-                    messageType: lastBotMessageType // NOUVEAU : Envoyer le type
+                    messageType: lastBotMessageType
                 })
             });
             
@@ -2084,12 +2047,6 @@ function addActionButtons() {
                 }
                 
                 addMessage(botResponse);
-                
-                // NOUVEAU : Détecter et sauvegarder si c'est une réponse à une question spécifique
-                if (isAuthenticated && currentPartnerData && lastBotMessageType && 
-                    !['descriptif', 'logos', 'contact'].includes(lastBotMessageType)) {
-                    await detectAndSaveField(message, currentPartnerCode, currentPartnerData);
-                }
                 
                 // Rafraîchir les données après 2 secondes
                 if (isAuthenticated && isExtendedMode) {
@@ -2174,6 +2131,9 @@ function addActionButtons() {
             // Configurer les événements pour le chat étendu
             setupExtendedChat();
             
+            // Charger les fichiers existants
+            loadExistingFiles();
+            
             // Scroll vers le bas
             chatMessagesExtended.scrollTop = chatMessagesExtended.scrollHeight;
         }
@@ -2194,7 +2154,7 @@ function addActionButtons() {
             chatInputExtended.focus();
         }
         
-        // Afficher les données partenaire
+        // MODIFIÉ : Afficher les données partenaire avec nouveaux champs
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -2203,8 +2163,6 @@ function addActionButtons() {
             document.getElementById('nomContact').textContent = data['Nom Contact'] || '-';
             document.getElementById('emailContact').textContent = data['Email Contact'] || '-';
             document.getElementById('telephone').textContent = data['Téléphone'] || '-';
-            document.getElementById('atelier').textContent = data['Atelier'] || '-';
-            document.getElementById('speedmeeting').textContent = data['Speedmeeting'] || '-';
             
             // Formatage spécial pour la deadline
             const deadlineElement = document.getElementById('deadline');
@@ -2217,6 +2175,10 @@ function addActionButtons() {
             // Affichage simplifié
             document.getElementById('equipementsApportes').textContent = data['Équipements apportés'] || '-';
             document.getElementById('dateLivraison').textContent = data['Date livraison souhaitée'] || '-';
+            
+            // NOUVEAU : Afficher les nouveaux champs
+            document.getElementById('atelier').textContent = data['Atelier'] || '-';
+            document.getElementById('speedmeeting').textContent = data['Speedmeeting'] || '-';
             
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
@@ -2275,7 +2237,7 @@ function addActionButtons() {
             } else {
                 // Formater le contenu pour les messages bot
                 const formattedContent = formatMessage(content);
-                // NOUVEAU : Ajouter les boutons d'action après chaque message bot si authentifié
+                // Ajouter les boutons d'action après chaque message bot si authentifié
                 const quickActions = isAuthenticated && isExtendedMode ? addActionButtons() : addQuickActions(content);
                 messageDiv.innerHTML = `
                     <div class="avatar">🤖</div>
@@ -2335,6 +2297,32 @@ function addActionButtons() {
             currentSendButton.disabled = !enabled;
         }
         
+        // NOUVEAU : Charger les fichiers existants
+        async function loadExistingFiles() {
+            if (!currentPartnerCode) return;
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get-partner-files',
+                        codeUnique: currentPartnerCode
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.files) {
+                    uploadedFiles = result.files;
+                    updateFilesList();
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement fichiers:', error);
+            }
+        }
+        
         // Fonctions upload
         function allowDrop(event) {
             event.preventDefault();
@@ -2363,9 +2351,40 @@ function addActionButtons() {
             }
         }
         
+        // NOUVEAU : Détecter le type de logo
+        function detectLogoType(fileName) {
+            const name = fileName.toLowerCase();
+            
+            if (name.includes('cmjn') || name.includes('cmyk') || name.includes('couleur') || name.includes('color')) {
+                return 'CMJN';
+            } else if (name.includes('negatif') || name.includes('négatif') || name.includes('fond_sombre') || name.includes('blanc') || name.includes('white')) {
+                return 'Négatif';
+            }
+            
+            // Si pas de détection automatique, demander à l'utilisateur
+            return null;
+        }
+        
+        // MODIFIÉ : Upload avec détection de type et stockage Drive
         async function uploadFile(file) {
             try {
                 console.log('Upload fichier:', file.name);
+                
+                // Détecter le type de logo
+                let logoType = detectLogoType(file.name);
+                
+                if (!logoType) {
+                    // Demander à l'utilisateur
+                    logoType = prompt(`Quel type de logo est "${file.name}" ?\n\n1. Tapez "CMJN" pour logo couleur\n2. Tapez "Négatif" pour logo fond sombre\n\nVotre choix :`);
+                    
+                    if (!logoType || !['CMJN', 'Négatif'].includes(logoType)) {
+                        alert('Type de logo non valide. Upload annulé.');
+                        return;
+                    }
+                }
+                
+                // Convertir le fichier en base64 pour l'envoi
+                const base64 = await fileToBase64(file);
                 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -2375,7 +2394,10 @@ function addActionButtons() {
                         fileName: file.name,
                         fileSize: file.size,
                         contentType: file.type,
-                        codeUnique: currentPartnerCode
+                        codeUnique: currentPartnerCode,
+                        companyName: currentPartnerData['Nom Entreprise'],
+                        logoType: logoType,
+                        fileData: base64
                     })
                 });
                 
@@ -2384,10 +2406,16 @@ function addActionButtons() {
                 if (result.success) {
                     uploadedFiles.push({
                         ...result.data,
-                        originalFile: file
+                        originalFile: file,
+                        logoType: logoType
                     });
                     updateFilesList();
                     showSaveIndicator();
+                    
+                    // Rafraîchir les données pour voir le lien dans le sheet
+                    setTimeout(() => {
+                        refreshPartnerData();
+                    }, 1000);
                 } else {
                     alert('Erreur upload: ' + result.error);
                 }
@@ -2398,6 +2426,17 @@ function addActionButtons() {
             }
         }
         
+        // NOUVEAU : Convertir fichier en base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]); // Enlever le préfixe data:
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // MODIFIÉ : Afficher les fichiers avec type de logo
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
@@ -2410,7 +2449,8 @@ function addActionButtons() {
                 <div class="file-item">
                     <div class="file-info">
                         <div class="file-name">${file.fileName}</div>
-                        <div class="file-size">${formatFileSize(file.originalFile.size)}</div>
+                        <div class="file-size">${formatFileSize(file.fileSize || file.originalFile?.size || 0)}</div>
+                        <div class="file-type">${file.logoType || 'Logo'}</div>
                     </div>
                     <div class="file-actions">
                         <button class="btn-small btn-download" onclick="downloadFile('${file.fileId}')">
@@ -2432,24 +2472,69 @@ function addActionButtons() {
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
-        function downloadFile(fileId) {
-            const file = uploadedFiles.find(f => f.fileId === fileId);
-            if (file) {
-                const url = URL.createObjectURL(file.originalFile);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+        // MODIFIÉ : Télécharger depuis Drive
+        async function downloadFile(fileId) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'download-file',
+                        fileId: fileId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.downloadUrl) {
+                    // Ouvrir le lien de téléchargement
+                    window.open(result.downloadUrl, '_blank');
+                } else {
+                    alert('Erreur lors du téléchargement');
+                }
+                
+            } catch (error) {
+                console.error('Erreur téléchargement:', error);
+                alert('Erreur lors du téléchargement');
             }
         }
         
-        function deleteFile(index) {
+        // MODIFIÉ : Supprimer fichier du Drive et du Sheet
+        async function deleteFile(index) {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
-                uploadedFiles.splice(index, 1);
-                updateFilesList();
+                const file = uploadedFiles[index];
+                
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'delete-file',
+                            fileId: file.fileId,
+                            codeUnique: currentPartnerCode,
+                            logoType: file.logoType
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        uploadedFiles.splice(index, 1);
+                        updateFilesList();
+                        showSaveIndicator();
+                        
+                        // Rafraîchir les données
+                        setTimeout(() => {
+                            refreshPartnerData();
+                        }, 1000);
+                    } else {
+                        alert('Erreur lors de la suppression');
+                    }
+                    
+                } catch (error) {
+                    console.error('Erreur suppression fichier:', error);
+                    alert('Erreur lors de la suppression');
+                }
             }
         }
         
