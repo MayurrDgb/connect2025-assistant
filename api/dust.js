@@ -429,7 +429,7 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                         <strong>Deadline importante :</strong> Toutes vos informations doivent être complétées avant le <strong style="color: #E2001A;">1er septembre 2025</strong>.
                     </p>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
-                        Pour toute question, n'hésitez pas à nous contacter à <a href="mailto:events@mbefrance.fr" style="color: #E2001A;">events@mbefrance.fr</a> ou au <strong>(+33) 01 41 90 12 10</strong>.
+                        Pour toute question, n'hésitez pas à nous contacter à <a href="mailto:infoconnect@mbefrance.fr" style="color: #E2001A;">infoconnect@mbefrance.fr</a> ou au <strong>(+33) 01 41 90 12 10</strong>.
                     </p>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6;">
                         À bientôt pour Connect 2025 !<br>
