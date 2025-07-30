@@ -1418,7 +1418,7 @@
             }
         }
         
-        // Fonction générique pour sauvegarder un champ
+        // MODIFIÉ : Fonction générique pour sauvegarder un champ avec commentaire
         async function saveField(fieldName, value) {
             if (!currentPartnerCode || !value || !value.trim()) return;
             
@@ -1439,7 +1439,7 @@
                 if (result.success) {
                     showSaveIndicator();
                     
-                    // Commenter l'action
+                    // NOUVEAU : Commenter l'action
                     commentUserAction(fieldName, value);
                     
                     // Rafraîchir les données après sauvegarde
@@ -2139,7 +2139,7 @@
             else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting';
             else if (message === 'Logos') lastBotMessageType = 'logos';
             else if (message === 'Contacter équipe') {
-                // Gestion spéciale pour contact équipe
+                // NOUVEAU : Gestion spéciale pour contact équipe
                 setTimeout(() => {
                     hideTyping();
                     addMessage("📧 Quel message voulez-vous envoyer à l'équipe organisatrice ?\n\nTapez votre message ci-dessous :");
@@ -2150,7 +2150,7 @@
                 return;
             }
             else if (lastBotMessageType === 'contact-pending') {
-                // Traitement du message pour l'équipe
+                // NOUVEAU : Traitement du message pour l'équipe
                 try {
                     const partnerData = currentPartnerData;
                     const response = await fetch(API_URL, {
@@ -2386,7 +2386,8 @@
                 
                 if (result.success) {
                     showSaveIndicator();
-                    // Commenter l'action
+                    
+                    // NOUVEAU : Commenter l'action
                     commentUserAction('Descriptif entreprise', description);
                 }
                 
@@ -2612,7 +2613,7 @@
             });
         }
         
-        // CORRIGÉ : Afficher les fichiers avec type de logo
+        // CORRIGÉ : Afficher les fichiers avec gestion des noms
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
