@@ -1045,25 +1045,164 @@
             text-decoration: underline;
         }
         
-        /* Responsive */
+        /* Chat flottant pour mobile */
+        .floating-chat-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #E2001A;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(226, 0, 26, 0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .floating-chat-btn:hover {
+            background: #c41e3a;
+            transform: scale(1.1);
+        }
+        
+        .floating-chat-btn.active {
+            background: #c41e3a;
+        }
+        
+        /* Modal chat pour mobile */
+        .mobile-chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        
+        .mobile-chat-modal.show {
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .mobile-chat-content {
+            width: 100%;
+            height: 80vh;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .mobile-chat-header {
+            background: linear-gradient(135deg, #E2001A 0%, #c41e3a 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .mobile-chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Responsive amélioré */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            
-            .main-container.show {
-                flex-direction: column;
+            body { 
+                padding: 10px; 
             }
             
+            /* Masquer l'interface double sur mobile */
+            .main-container.show {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            /* Panel d'informations prend tout l'écran sur mobile */
             .info-panel {
-                flex: none;
-                height: 40%;
+                flex: 1;
+                width: 100%;
+                height: calc(100vh - 40px);
+                margin: 0;
+                border-radius: 15px;
+            }
+            
+            /* Masquer le chat panel sur mobile */
+            .chat-panel {
+                display: none !important;
+            }
+            
+            /* Afficher le bouton chat flottant sur mobile */
+            .floating-chat-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Optimiser les sections pour mobile */
+            .info-sections-container {
+                gap: 20px;
+            }
+            
+            .info-section {
+                padding: 15px;
+            }
+            
+            .info-section h3 {
+                font-size: 16px;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
             }
             
+            .info-item {
+                padding: 12px;
+            }
+            
+            .editable-field {
+                min-height: 80px;
+                padding: 10px;
+                font-size: 16px; /* Éviter le zoom sur iOS */
+            }
+            
+            .editable-input {
+                padding: 12px;
+                font-size: 16px; /* Éviter le zoom sur iOS */
+            }
+            
+            /* Optimiser l'upload sur mobile */
+            .upload-zone {
+                padding: 20px 15px;
+            }
+            
+            .upload-icon {
+                font-size: 36px;
+            }
+            
+            /* Optimiser les stats admin sur mobile */
             .stats-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .admin-actions {
@@ -1073,6 +1212,67 @@
             
             .admin-btn {
                 justify-content: center;
+                padding: 12px 16px;
+            }
+            
+            /* Optimiser les modals sur mobile */
+            .modal-content {
+                width: 95%;
+                max-width: none;
+                margin: 10px;
+            }
+            
+            /* Optimiser le tableau partenaires sur mobile */
+            .partners-table {
+                font-size: 12px;
+            }
+            
+            .partners-table th,
+            .partners-table td {
+                padding: 8px 5px;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .partners-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+        }
+        
+        /* Très petits écrans */
+        @media (max-width: 480px) {
+            .company-header {
+                padding: 15px;
+            }
+            
+            .company-name {
+                font-size: 20px;
+            }
+            
+            .info-section {
+                padding: 12px;
+            }
+            
+            .info-section h3 {
+                font-size: 15px;
+            }
+            
+            .optional-note {
+                font-size: 10px;
+                padding: 6px 10px;
+            }
+            
+            .floating-chat-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                bottom: 15px;
+                right: 15px;
             }
         }
     </style>
@@ -1205,7 +1405,6 @@
                             class="editable-input" 
                             id="dateLivraison" 
                             min="2025-09-22"
-                            max="2025-09-26"
                             onchange="saveFieldOptimized('Date livraison souhaitée', this.value)"
                             oninput="markAsModified(this)">
                     </div>
@@ -1297,8 +1496,8 @@
                         <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
                              ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
                             <div class="upload-icon">📁</div>
-                            <p><strong>Cliquez pour sélectionner et chargez un fichier à la fois</strong></p>
-                            <p>Attention : attendez la confirmation de l'enregistrement</p>
+                            <p><strong>Cliquez pour sélectionner vos fichiers</strong></p>
+                            <p>Attention : chargez un fichier à la fois pour permettre le traitement.</p>
                             <p style="font-size: 12px; color: #666; margin-top: 10px;">
                                 Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
                             </p>
@@ -1498,6 +1697,40 @@
         </div>
     </div>
     
+    <!-- Bouton chat flottant pour mobile -->
+    <button class="floating-chat-btn" id="floatingChatBtn" onclick="toggleMobileChat()">
+        💬
+    </button>
+
+    <!-- Modal chat mobile -->
+    <div class="mobile-chat-modal" id="mobileChatModal">
+        <div class="mobile-chat-content">
+            <div class="mobile-chat-header">
+                <h3>🤖 Assistant Connect 2025</h3>
+                <button class="mobile-chat-close" onclick="closeMobileChat()">×</button>
+            </div>
+            <div class="chat-messages" id="mobileChatMessages">
+                <!-- Messages copiés ici -->
+            </div>
+            <div class="typing-indicator" id="mobileChatTyping">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="mobileChatInput" 
+                       placeholder="Tapez votre message..." maxlength="500">
+                <button class="send-button" id="mobileChatSend">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Indicateur de sauvegarde -->
     <div class="save-indicator" id="saveIndicator">
         ✅ Sauvegardé automatiquement
@@ -1542,7 +1775,7 @@
             `;
         }
         
-        // NOUVEAU : Boutons contextuels selon le contenu
+        // Boutons contextuels selon le contenu
         function addContextualActions(content) {
             const actions = [];
             const lowerContent = content.toLowerCase();
@@ -1589,7 +1822,7 @@
             return '';
         }
         
-        // OPTIMISÉ : Commentaires moins fréquents
+        // Commentaires moins fréquents
         function commentUserAction(fieldName, value) {
             // Ne commenter que si le mode étendu est actif et que le texte est substantiel
             if (!isExtendedMode || !value || value.trim().length < 20) return;
@@ -1647,7 +1880,7 @@
             }
         }
         
-        // OPTIMISÉ : Sauvegarde plus rapide et moins bloquante
+        // Sauvegarde plus rapide et moins bloquante
         async function saveField(fieldName, value) {
             if (!currentPartnerCode || !value || !value.trim()) return;
             
@@ -1697,7 +1930,7 @@
             }
         }
         
-        // NOUVEAU : Marquer les champs comme modifiés
+        // Marquer les champs comme modifiés
         function markAsModified(element) {
             element.classList.add('modified');
             element.classList.remove('saved');
@@ -1711,7 +1944,7 @@
             }, 2000);
         }
         
-        // NOUVEAU : Sauvegarde optimisée avec feedback visuel
+        // Sauvegarde optimisée avec feedback visuel
         async function saveFieldOptimized(fieldName, value) {
             const element = document.getElementById(getElementIdFromField(fieldName));
             
@@ -1755,7 +1988,7 @@
             return mapping[fieldName] || '';
         }
         
-        // OPTIMISÉ : Indicateur de sauvegarde amélioré
+        // Indicateur de sauvegarde amélioré
         function showSaveIndicator(message = '✅ Sauvegardé automatiquement', type = 'success') {
             const indicator = document.getElementById('saveIndicator');
             
@@ -1779,6 +2012,115 @@
                 indicator.classList.remove('show');
             }, delay);
         }
+        
+        // Fonctions pour le chat mobile
+        function toggleMobileChat() {
+            const modal = document.getElementById('mobileChatModal');
+            const btn = document.getElementById('floatingChatBtn');
+            
+            if (modal.classList.contains('show')) {
+                closeMobileChat();
+            } else {
+                openMobileChat();
+            }
+        }
+
+        function openMobileChat() {
+            const modal = document.getElementById('mobileChatModal');
+            const btn = document.getElementById('floatingChatBtn');
+            const mobileChatMessages = document.getElementById('mobileChatMessages');
+            
+            // Copier les messages du chat étendu
+            const extendedMessages = document.getElementById('chatMessagesExtended');
+            if (extendedMessages) {
+                mobileChatMessages.innerHTML = extendedMessages.innerHTML;
+            }
+            
+            modal.classList.add('show');
+            btn.classList.add('active');
+            
+            // Configurer les événements
+            setupMobileChatEvents();
+            
+            // Scroll vers le bas
+            setTimeout(() => {
+                mobileChatMessages.scrollTop = mobileChatMessages.scrollHeight;
+            }, 100);
+        }
+
+        function closeMobileChat() {
+            const modal = document.getElementById('mobileChatModal');
+            const btn = document.getElementById('floatingChatBtn');
+            
+            modal.classList.remove('show');
+            btn.classList.remove('active');
+        }
+
+        function setupMobileChatEvents() {
+            const input = document.getElementById('mobileChatInput');
+            const sendBtn = document.getElementById('mobileChatSend');
+            
+            // Supprimer les anciens événements
+            input.replaceWith(input.cloneNode(true));
+            sendBtn.replaceWith(sendBtn.cloneNode(true));
+            
+            // Récupérer les nouveaux éléments
+            const newInput = document.getElementById('mobileChatInput');
+            const newSendBtn = document.getElementById('mobileChatSend');
+            
+            newSendBtn.addEventListener('click', () => {
+                sendMobileMessage();
+            });
+            
+            newInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMobileMessage();
+                }
+            });
+        }
+
+        function sendMobileMessage() {
+            const input = document.getElementById('mobileChatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Utiliser la fonction existante en mettant à jour l'input principal
+            const mainInput = getCurrentInput();
+            mainInput.value = message;
+            input.value = '';
+            
+            // Envoyer le message
+            sendMessage();
+            
+            // Fermer le chat mobile après envoi
+            setTimeout(() => {
+                closeMobileChat();
+            }, 500);
+        }
+
+        // Détecter si on est sur mobile
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Adapter l'interface selon la taille d'écran
+        function adaptInterface() {
+            if (isMobile() && isExtendedMode) {
+                // Afficher le bouton flottant sur mobile
+                document.getElementById('floatingChatBtn').style.display = 'flex';
+            } else {
+                // Masquer le bouton flottant sur desktop
+                document.getElementById('floatingChatBtn').style.display = 'none';
+            }
+        }
+
+        // Écouter les changements de taille d'écran
+        window.addEventListener('resize', adaptInterface);
+
+        // Adapter l'interface au chargement
+        window.addEventListener('load', adaptInterface);
         
         // Fonction utilitaire pour formater les dates pour les inputs
         function formatDateForInput(dateString) {
@@ -2456,7 +2798,7 @@
             }
         }
         
-        // MODIFIÉ : Détecter les nouveaux types de messages avec contact équipe simplifié
+        // Détecter les nouveaux types de messages avec contact équipe simplifié
         async function handleRegularMessage(message) {
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
@@ -2544,7 +2886,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
             }, 1200);
         }
         
-        // OPTIMISÉ : Rafraîchissement plus intelligent
+        // Rafraîchissement plus intelligent
         async function refreshPartnerData() {
             if (!currentPartnerCode || !isAuthenticated) return;
             
@@ -2584,7 +2926,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
             }
         }
         
-        // NOUVEAU : Mise à jour seulement de la progression
+        // Mise à jour seulement de la progression
         function updateProgressionOnly(data) {
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
@@ -2619,9 +2961,8 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 <div class="avatar">🤖</div>
                 <div class="message-bubble">
                     <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
-                    <p>Vous pouvez maintenant modifier directement vos informations dans le panneau de gauche ou me poser des questions.</p>
-                    <p>Que souhaitez-vous faire maintenant ?</p>
-                    ${addActionButtons()}
+                    <p>Vous pouvez maintenant modifier directement vos informations dans le panneau${isMobile() ? '. Utilisez le bouton 💬 pour me parler.' : ' de gauche ou me poser des questions.'}</p>
+                    ${!isMobile() ? '<p>Que souhaitez-vous faire maintenant ?</p>' + addActionButtons() : ''}
                 </div>
             `;
             chatMessagesExtended.appendChild(welcomeMessage);
@@ -2634,11 +2975,16 @@ L'équipe vous répondra dans les plus brefs délais !`);
             // Remplir le panel d'informations
             displayPartnerData(currentPartnerData);
             
-            // Configurer les événements pour le chat étendu
-            setupExtendedChat();
+            // Configurer les événements pour le chat étendu (seulement sur desktop)
+            if (!isMobile()) {
+                setupExtendedChat();
+            }
             
             // Charger les fichiers existants
             loadExistingFiles();
+            
+            // Adapter l'interface
+            adaptInterface();
             
             // Scroll vers le bas
             chatMessagesExtended.scrollTop = chatMessagesExtended.scrollHeight;
@@ -2727,7 +3073,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
             }
         }
         
-        // CORRIGÉ : Fonction addMessage avec boutons contextuels
+        // Fonction addMessage avec boutons contextuels
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
@@ -2738,7 +3084,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 // Formater le contenu pour les messages bot
                 const formattedContent = formatMessage(content);
                 
-                // MODIFIÉ : Boutons d'action seulement dans certains cas
+                // Boutons d'action seulement dans certains cas
                 let quickActions = '';
                 
                 if (isAuthenticated && isExtendedMode) {
@@ -2791,7 +3137,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
             return '';
         }
         
-        // CORRIGÉ : Fonction sendQuickMessage sans problème d'échappement
+        // Fonction sendQuickMessage sans problème d'échappement
         function sendQuickMessage(message) {
             // Nettoyer le message pour éviter les problèmes d'échappement
             const cleanMessage = message.replace(/\s+/g, ' ').trim();
