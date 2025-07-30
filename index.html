@@ -754,7 +754,7 @@
             outline: none;
         }
         
-        /* NOUVEAU : Style pour les champs éditables courts */
+        /* Style pour les champs éditables courts */
         .editable-input {
             width: 100%;
             padding: 12px 15px;
@@ -1068,7 +1068,7 @@
                 </textarea>
             </div>
             
-            <!-- MODIFIÉ : Équipements/matériels à livrer - ÉDITABLE -->
+            <!-- Équipements/matériels à livrer - ÉDITABLE -->
             <div class="info-section">
                 <h3>📦 Équipements/matériels à livrer</h3>
                 <textarea 
@@ -1079,7 +1079,7 @@
                 </textarea>
             </div>
             
-            <!-- MODIFIÉ : Date de livraison prévue - ÉDITABLE -->
+            <!-- Date de livraison prévue - ÉDITABLE -->
             <div class="info-section">
                 <h3>📅 Date de livraison prévue</h3>
                 <input 
@@ -1087,10 +1087,10 @@
                     class="editable-input" 
                     id="dateLivraison" 
                     onchange="saveField('Date livraison souhaitée', this.value)">
-                <div class="optional-note">Attention : les livraisons sont possibles à partir du 22 septembre 2025. Choisissez votre date de livraison prévue.</div>
+                <div class="optional-note">Choisissez votre date de livraison préférée</div>
             </div>
             
-            <!-- NOUVEAU : Ateliers & Speed Meetings - ÉDITABLES -->
+            <!-- Ateliers & Speed Meetings - ÉDITABLES -->
             <div class="info-section">
                 <h3>🎓 Atelier</h3>
                 <textarea 
@@ -1120,10 +1120,10 @@
                     <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
                          ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
                         <div class="upload-icon">📁</div>
-                        <p><strong>Déposez un fichier à la fois</strong></p>
-                        <p>Cliquez pour sélectionner vos fichiers</p>
+                        <p><strong>Glissez vos fichiers ici</strong></p>
+                        <p>ou cliquez pour sélectionner</p>
                         <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                            Attendez le chargement complet, cela peut prendre du temps en fonctiondu poids.<br>Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
+                            Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
                         </p>
                     </div>
                     
@@ -1362,7 +1362,63 @@
             `;
         }
         
-        // NOUVEAU : Fonction générique pour sauvegarder un champ
+        // NOUVEAU : Fonction pour commenter les actions utilisateur
+        function commentUserAction(fieldName, value) {
+            if (!isExtendedMode || !value || value.trim().length < 10) return;
+            
+            // Calculer la progression actuelle
+            const currentData = currentPartnerData || {};
+            const fieldsToCheck = [
+                'Descriptif entreprise',
+                'Équipements apportés', 
+                'Date livraison souhaitée',
+                'Atelier',
+                'Speedmeeting'
+            ];
+            
+            let completedFields = 0;
+            fieldsToCheck.forEach(field => {
+                if (currentData[field] && currentData[field].toString().trim() !== '') {
+                    completedFields++;
+                }
+            });
+            
+            // Ajouter le champ qui vient d'être rempli s'il n'était pas déjà compté
+            if (!currentData[fieldName] || currentData[fieldName].toString().trim() === '') {
+                completedFields++;
+            }
+            
+            const progression = Math.round((completedFields / fieldsToCheck.length) * 100);
+            const remaining = fieldsToCheck.length - completedFields;
+            
+            let comment = '';
+            
+            switch(fieldName) {
+                case 'Descriptif entreprise':
+                    comment = `✅ Super ! Votre descriptif est enregistré. ${remaining > 0 ? `Plus que ${remaining} étapes pour finaliser !` : 'Profil complet ! 🎉'}`;
+                    break;
+                case 'Équipements apportés':
+                    comment = `📦 Parfait ! Vos équipements sont notés. ${remaining > 0 ? `Il reste ${remaining} informations à compléter.` : 'Tout est prêt ! 🎉'}`;
+                    break;
+                case 'Date livraison souhaitée':
+                    comment = `📅 Date de livraison enregistrée ! ${remaining > 0 ? `Encore ${remaining} étapes.` : 'Profil 100% complet ! 🎉'}`;
+                    break;
+                case 'Atelier':
+                    comment = `🎓 Atelier configuré ! ${remaining > 0 ? `Plus que ${remaining} à faire.` : 'Tout est finalisé ! 🎉'}`;
+                    break;
+                case 'Speedmeeting':
+                    comment = `⚡ Speed meeting programmé ! ${remaining > 0 ? `${remaining} étapes restantes.` : 'Configuration terminée ! 🎉'}`;
+                    break;
+            }
+            
+            if (comment) {
+                setTimeout(() => {
+                    addMessage(comment + '\n\nQue souhaitez-vous faire maintenant ?');
+                }, 1500);
+            }
+        }
+        
+        // Fonction générique pour sauvegarder un champ
         async function saveField(fieldName, value) {
             if (!currentPartnerCode || !value || !value.trim()) return;
             
@@ -1382,6 +1438,10 @@
                 
                 if (result.success) {
                     showSaveIndicator();
+                    
+                    // Commenter l'action
+                    commentUserAction(fieldName, value);
+                    
                     // Rafraîchir les données après sauvegarde
                     setTimeout(() => {
                         refreshPartnerData();
@@ -2069,7 +2129,7 @@
             }
         }
         
-        // Détecter les nouveaux types de messages
+        // MODIFIÉ : Détecter les nouveaux types de messages avec gestion contact équipe
         async function handleRegularMessage(message) {
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
@@ -2078,7 +2138,58 @@
             else if (message === 'Atelier') lastBotMessageType = 'atelier';
             else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting';
             else if (message === 'Logos') lastBotMessageType = 'logos';
-            else if (message === 'Contacter équipe') lastBotMessageType = 'contact';
+            else if (message === 'Contacter équipe') {
+                // Gestion spéciale pour contact équipe
+                setTimeout(() => {
+                    hideTyping();
+                    addMessage("📧 Quel message voulez-vous envoyer à l'équipe organisatrice ?\n\nTapez votre message ci-dessous :");
+                    setInputEnabled(true);
+                    getCurrentInput().focus();
+                    lastBotMessageType = 'contact-pending'; // État d'attente du message
+                }, 800);
+                return;
+            }
+            else if (lastBotMessageType === 'contact-pending') {
+                // Traitement du message pour l'équipe
+                try {
+                    const partnerData = currentPartnerData;
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'contact-team',
+                            partnerCode: currentPartnerCode,
+                            message: message,
+                            contactName: partnerData['Nom Contact'],
+                            companyName: partnerData['Nom Entreprise']
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    setTimeout(() => {
+                        hideTyping();
+                        if (result.success) {
+                            addMessage("✅ Votre message a été envoyé à l'équipe organisatrice (events@mbefrance.fr). Vous recevrez une réponse par email.\n\nQue souhaitez-vous faire maintenant ?");
+                        } else {
+                            addMessage("❌ Erreur lors de l'envoi. Contactez directement events@mbefrance.fr");
+                        }
+                        lastBotMessageType = null; // Reset
+                        setInputEnabled(true);
+                        getCurrentInput().focus();
+                    }, 1000);
+                    
+                } catch (error) {
+                    setTimeout(() => {
+                        hideTyping();
+                        addMessage("❌ Erreur technique. Contactez events@mbefrance.fr");
+                        lastBotMessageType = null;
+                        setInputEnabled(true);
+                        getCurrentInput().focus();
+                    }, 1000);
+                }
+                return;
+            }
             
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -2220,7 +2331,7 @@
             chatInputExtended.focus();
         }
         
-        // MODIFIÉ : Afficher les données partenaire avec nouveaux champs éditables
+        // Afficher les données partenaire avec nouveaux champs éditables
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -2275,6 +2386,8 @@
                 
                 if (result.success) {
                     showSaveIndicator();
+                    // Commenter l'action
+                    commentUserAction('Descriptif entreprise', description);
                 }
                 
             } catch (error) {
@@ -2499,7 +2612,7 @@
             });
         }
         
-        // Afficher les fichiers avec type de logo
+        // CORRIGÉ : Afficher les fichiers avec type de logo
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
@@ -2508,23 +2621,31 @@
                 return;
             }
             
-            filesList.innerHTML = uploadedFiles.map((file, index) => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-name">${file.fileName}</div>
-                        <div class="file-size">${formatFileSize(file.fileSize || file.originalFile?.size || 0)}</div>
-                        <div class="file-type">${file.logoType || 'Logo'}</div>
+            filesList.innerHTML = uploadedFiles.map((file, index) => {
+                // CORRECTION : Gérer les différentes sources de nom de fichier
+                const fileName = file.fileName || file.originalFile?.name || 'Fichier sans nom';
+                const fileSize = file.fileSize || file.originalFile?.size || 0;
+                const logoType = file.logoType || 'Document';
+                const fileId = file.fileId || `temp_${index}`;
+                
+                return `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-name">${fileName}</div>
+                            <div class="file-size">${formatFileSize(fileSize)}</div>
+                            <div class="file-type">${logoType}</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn-small btn-download" onclick="downloadFile('${fileId}')">
+                                📥 Télécharger
+                            </button>
+                            <button class="btn-small btn-delete" onclick="deleteFile(${index})">
+                                🗑️ Supprimer
+                            </button>
+                        </div>
                     </div>
-                    <div class="file-actions">
-                        <button class="btn-small btn-download" onclick="downloadFile('${file.fileId}')">
-                            📥 Télécharger
-                        </button>
-                        <button class="btn-small btn-delete" onclick="deleteFile(${index})">
-                            🗑️ Supprimer
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
         
         function formatFileSize(bytes) {
