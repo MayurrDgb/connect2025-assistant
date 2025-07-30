@@ -408,7 +408,7 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                     
                     <!-- Bouton d'accès à l'application -->
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="https://connect2025-assistant-3bjg4ha2m-mbe-projects.vercel.app/" 
+                        <a href="https://connect2025-assistant.vercel.app/" 
                            style="display: inline-block; background: #E2001A; color: white; padding: 15px 30px; 
                                   text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                             Accéder à votre espace partenaire
