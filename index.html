@@ -982,7 +982,7 @@
         <div class="chat-container">
             <div class="chat-header">
                 <h2>🤖 Assistant Connect 2025</h2>
-                <div class="subtitle">Je peux parfois mettre un peu de temps à répondre, merci de votre patience 😊</div>
+                <div class="subtitle">Je peux parfois mettre un peu de temps à répondre,<br> merci de votre patience 😊</div>
             </div>
             
             <div class="chat-messages" id="chatMessages">
@@ -1066,6 +1066,7 @@
                     placeholder="Saisissez le descriptif de votre entreprise..."
                     onblur="saveDescription()">
                 </textarea>
+                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
             
             <!-- Équipements/matériels à livrer - ÉDITABLE -->
@@ -1077,40 +1078,44 @@
                     placeholder="Décrivez les équipements à livrer (affiches, livres, matériel, etc.)..."
                     onblur="saveField('Équipements apportés', this.value)">
                 </textarea>
+                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
             
             <!-- Date de livraison prévue - ÉDITABLE -->
             <div class="info-section">
                 <h3>📅 Date de livraison prévue</h3>
+                <div class="optional-note">Vous pouvez livrer à partir du 22 septembre. Choisissez la date de votre livraison.</div>
                 <input 
                     type="date" 
                     class="editable-input" 
                     id="dateLivraison" 
                     onchange="saveField('Date livraison souhaitée', this.value)">
-                <div class="optional-note">Choisissez votre date de livraison préférée</div>
+                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
             
             <!-- Ateliers & Speed Meetings - ÉDITABLES -->
             <div class="info-section">
                 <h3>🎓 Atelier</h3>
+                <div class="optional-note">Uniquement si vous avez pris l'option</div>
                 <textarea 
                     class="editable-field" 
                     id="atelier" 
                     placeholder="Si vous avez pris l'option atelier, décrivez la thématique et le contenu..."
                     onblur="saveField('Atelier', this.value)">
                 </textarea>
-                <div class="optional-note">Uniquement si vous avez pris l'option</div>
+                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
             
             <div class="info-section">
                 <h3>⚡ Speed Meeting</h3>
+                <div class="optional-note">Uniquement si vous avez pris l'option</div>
                 <textarea 
                     class="editable-field" 
                     id="speedmeeting" 
                     placeholder="Si vous avez pris l'option speed meeting, décrivez la thématique et le contenu..."
                     onblur="saveField('Speedmeeting', this.value)">
                 </textarea>
-                <div class="optional-note">Uniquement si vous avez pris l'option</div>
+                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
             </div>
             
             <!-- Fichiers -->
@@ -1120,8 +1125,8 @@
                     <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
                          ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
                         <div class="upload-icon">📁</div>
-                        <p><strong>Glissez vos fichiers ici</strong></p>
-                        <p>ou cliquez pour sélectionner</p>
+                        <p><strong>Cliquez pour sélectionner vos fichiers</strong></p>
+                        <p>Attention : chargez un fichier à la fois pour permettre le traitement.</p>
                         <p style="font-size: 12px; color: #666; margin-top: 10px;">
                             Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
                         </p>
@@ -1141,7 +1146,7 @@
         <div class="chat-panel">
             <div class="chat-header">
                 <h2>🤖 Assistant Connect 2025</h2>
-                <div class="subtitle">26-28 septembre • Campus de Cély</div>
+                <div class="subtitle">Je peux parfois mettre un peu de temps à répondre,<br> merci de votre patience 😊</div>
             </div>
             
             <div class="chat-messages" id="chatMessagesExtended">
