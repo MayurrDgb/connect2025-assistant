@@ -1373,6 +1373,7 @@
                     <button class="quick-btn" onclick="sendQuickMessage('Date livraison')">📅 Livraison</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Régimes et allergies')">🍽️ Régimes</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
                 </div>
@@ -1425,6 +1426,9 @@
                     break;
                 case 'Speedmeeting':
                     comment = `⚡ Speed meeting programmé ! ${remaining > 0 ? `${remaining} étapes restantes.` : 'Configuration terminée ! 🎉'}`;
+                    break;
+                case 'Régimes alimentaires et allergies':
+                    comment = `🍽️ Informations alimentaires enregistrées ! ${remaining > 0 ? `Plus que ${remaining} étapes.` : 'Profil 100% complet ! 🎉'}`;
                     break;
             }
             
@@ -2155,6 +2159,7 @@
             else if (message === 'Atelier') lastBotMessageType = 'atelier';
             else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting';
             else if (message === 'Logos') lastBotMessageType = 'logos';
+            else if (message === 'Régimes et allergies') lastBotMessageType = 'regimes'; 
             else if (message === 'Contacter équipe') {
                 // NOUVEAU : Gestion spéciale pour contact équipe
                 setTimeout(() => {
