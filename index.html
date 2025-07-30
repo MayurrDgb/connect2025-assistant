@@ -724,63 +724,97 @@
             color: #666;
         }
         
+        /* AMÉLIORÉ : Sections d'informations mieux organisées */
+        .info-sections-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
         .info-section {
-            margin-bottom: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #E2001A;
+            transition: all 0.3s ease;
+        }
+        
+        .info-section:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .info-section h3 {
             color: #E2001A;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
             font-size: 18px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-weight: 600;
         }
         
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, #E2001A, transparent);
+            margin: 30px 0;
+            border-radius: 1px;
+        }
+        
+        /* Champs éditables améliorés */
         .editable-field {
             width: 100%;
             min-height: 100px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
-            padding: 12px;
+            padding: 15px;
             font-family: inherit;
             font-size: 14px;
             resize: vertical;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: white;
         }
         
         .editable-field:focus {
             border-color: #E2001A;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
         }
         
-        /* Style pour les champs éditables courts */
         .editable-input {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: white;
         }
         
         .editable-input:focus {
             border-color: #E2001A;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
         }
         
+        /* Grille d'informations générales */
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
         
         .info-item {
-            background: #f8f9fa;
-            padding: 12px;
+            background: white;
+            padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid #E2001A;
+            border: 1px solid #e1e5e9;
+            transition: all 0.3s;
+        }
+        
+        .info-item:hover {
+            border-color: #E2001A;
+            transform: translateY(-2px);
         }
         
         .info-item label {
@@ -789,45 +823,56 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
         }
         
         .info-item .value {
-            margin-top: 5px;
             color: #666;
             font-size: 14px;
+            font-weight: 500;
         }
         
-        /* Style pour les notes optionnelles */
+        /* Notes optionnelles */
         .optional-note {
             font-size: 11px;
             color: #888;
             font-style: italic;
-            margin-top: 2px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(226, 0, 26, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #E2001A;
         }
         
+        /* Section fichiers améliorée */
         .files-section {
-            background: #f8f9fa;
+            background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
+            border: 2px dashed #e1e5e9;
+            transition: all 0.3s;
         }
         
         .upload-zone {
             border: 2px dashed #E2001A;
             border-radius: 10px;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: #fff5f5;
         }
         
         .upload-zone:hover {
-            background-color: #fff5f5;
+            background-color: #fff0f0;
             border-color: #c41e3a;
+            transform: translateY(-2px);
         }
         
         .upload-zone.dragover {
-            background-color: #fff5f5;
+            background-color: #fff0f0;
             border-color: #c41e3a;
             transform: scale(1.02);
         }
@@ -835,7 +880,7 @@
         .upload-icon {
             font-size: 48px;
             color: #E2001A;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         
         .file-input {
@@ -843,18 +888,25 @@
         }
         
         .current-files {
-            margin-top: 15px;
+            margin-top: 20px;
         }
         
         .file-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
+            padding: 15px;
             background: white;
             border-radius: 8px;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e1e5e9;
+            transition: all 0.3s;
+        }
+        
+        .file-item:hover {
+            border-color: #E2001A;
+            transform: translateY(-2px);
         }
         
         .file-info {
@@ -862,8 +914,9 @@
         }
         
         .file-name {
-            font-weight: 500;
+            font-weight: 600;
             color: #333;
+            margin-bottom: 4px;
         }
         
         .file-size {
@@ -875,7 +928,11 @@
             font-size: 11px;
             color: #E2001A;
             font-weight: 600;
-            margin-top: 2px;
+            margin-top: 4px;
+            padding: 2px 8px;
+            background: rgba(226, 0, 26, 0.1);
+            border-radius: 12px;
+            display: inline-block;
         }
         
         .file-actions {
@@ -884,12 +941,13 @@
         }
         
         .btn-small {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border: none;
             border-radius: 6px;
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 500;
         }
         
         .btn-download {
@@ -899,6 +957,7 @@
         
         .btn-download:hover {
             background: #c41e3a;
+            transform: translateY(-2px);
         }
         
         .btn-delete {
@@ -908,6 +967,7 @@
         
         .btn-delete:hover {
             background: #c82333;
+            transform: translateY(-2px);
         }
         
         .save-indicator {
@@ -916,12 +976,13 @@
             right: 20px;
             background: #28a745;
             color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-size: 14px;
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .save-indicator.show {
@@ -1034,122 +1095,173 @@
                 </div>
             </div>
             
-            <!-- Informations générales -->
-            <div class="info-section">
-                <h3>📋 Informations générales</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Contact</label>
-                        <div class="value" id="nomContact">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Email</label>
-                        <div class="value" id="emailContact">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Téléphone</label>
-                        <div class="value" id="telephone">-</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Deadline</label>
-                        <div class="value" id="deadline">-</div>
+            <div class="info-sections-container">
+                <!-- Informations générales -->
+                <div class="info-section">
+                    <h3>📋 Informations générales</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Contact</label>
+                            <div class="value" id="nomContact">-</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Email</label>
+                            <div class="value" id="emailContact">-</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Téléphone</label>
+                            <div class="value" id="telephone">-</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Deadline</label>
+                            <div class="value" id="deadline">-</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Descriptif modifiable -->
-            <div class="info-section">
-                <h3>📝 Descriptif entreprise</h3>
-                <textarea 
-                    class="editable-field" 
-                    id="description" 
-                    placeholder="Saisissez le descriptif de votre entreprise..."
-                    onblur="saveDescription()">
-                </textarea>
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
-            
-            <!-- Équipements/matériels à livrer - ÉDITABLE -->
-            <div class="info-section">
-                <h3>📦 Équipements/matériels à livrer</h3>
-                <textarea 
-                    class="editable-field" 
-                    id="equipements" 
-                    placeholder="Décrivez les équipements à livrer (affiches, livres, matériel, etc.)..."
-                    onblur="saveField('Équipements apportés', this.value)">
-                </textarea>
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
-            
-            <!-- Date de livraison prévue - ÉDITABLE -->
-            <div class="info-section">
-                <h3>📅 Date de livraison prévue (à partir du 22/09 seulement)</h3>
-                <div class="optional-note">Vous pouvez livrer à partir du 22 septembre. Choisissez la date de votre livraison.</div>
-                <input 
-                    type="date" 
-                    class="editable-input" 
-                    id="dateLivraison" 
-                    onchange="saveField('Date livraison souhaitée', this.value)">
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
-            
-            <!-- Ateliers & Speed Meetings - ÉDITABLES -->
-            <div class="info-section">
-                <h3>🎓 Atelier</h3>
-                <div class="optional-note">Uniquement si vous avez pris l'option</div>
-                <textarea 
-                    class="editable-field" 
-                    id="atelier" 
-                    placeholder="Si vous avez pris l'option atelier, décrivez la thématique et le contenu en texte brut..."
-                    onblur="saveField('Atelier', this.value)">
-                </textarea>
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
 
-            <!-- NOUVEAU : Régimes alimentaires et allergies -->
-            <div class="info-section">
-                <h3>🍽️ Régimes alimentaires et allergies</h3>
-                <div class="optional-note">Informations importantes pour l'organisation des repas</div>
-                <textarea 
-                    class="editable-field" 
-                    id="regimesAllergies" 
-                    placeholder="Indiquez vos régimes alimentaires (végétarien, végan, sans gluten...) et allergies alimentaires..."
-                    onblur="saveField('Régimes alimentaires et allergies', this.value)">
-                </textarea>
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
-            
-            <div class="info-section">
-                <h3>⚡ Speed Meeting</h3>
-                <div class="optional-note">Uniquement si vous avez pris l'option</div>
-                <textarea 
-                    class="editable-field" 
-                    id="speedmeeting" 
-                    placeholder="Si vous avez pris l'option speed meeting, décrivez la thématique et le contenu en texte brut..."
-                    onblur="saveField('Speedmeeting', this.value)">
-                </textarea>
-                <div class="optional-note">Attendez l'enregistrement avant de continuer.</div>
-            </div>
-            
-            <!-- Fichiers -->
-            <div class="info-section">
-                <h3>📁 Documents et logos</h3>
-                <div class="files-section">
-                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
-                         ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
-                        <div class="upload-icon">📁</div>
-                        <p><strong>Cliquez pour sélectionner vos fichiers</strong></p>
-                        <p>Attention : chargez un fichier à la fois pour permettre le traitement.</p>
-                        <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                            Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
-                        </p>
+                <div class="section-divider"></div>
+
+                <!-- SECTION 1 : Descriptif entreprise -->
+                <div class="info-section">
+                    <h3>📝 Descriptif de votre entreprise</h3>
+                    <div class="optional-note">Présentez votre entreprise, vos activités, vos services...</div>
+                    <textarea 
+                        class="editable-field" 
+                        id="description" 
+                        placeholder="Décrivez votre entreprise, vos activités principales, vos services, votre expertise..."
+                        onblur="saveField('Descriptif entreprise', this.value)">
+                    </textarea>
+                    <div class="optional-note">💾 Sauvegarde automatique - Attendez la confirmation</div>
+                </div>
+
+                <!-- SECTION 2 : Logistique -->
+                <div class="info-section">
+                    <h3>📦 Logistique & Livraison</h3>
+                    
+                    <!-- Équipements -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Équipements/matériels à livrer
+                        </label>
+                        <div class="optional-note">Décrivez tout ce que vous devez livrer sur site</div>
+                        <textarea 
+                            class="editable-field" 
+                            id="equipements" 
+                            placeholder="Ex: 2 roll-ups 85x200cm, 500 brochures A4, 1 écran 32 pouces, matériel de démonstration..."
+                            onblur="saveField('Équipements apportés', this.value)">
+                        </textarea>
                     </div>
+
+                    <!-- Date de livraison -->
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Date de livraison souhaitée
+                        </label>
+                        <div class="optional-note">⚠️ Livraisons possibles uniquement à partir du 22 septembre 2025</div>
+                        <input 
+                            type="date" 
+                            class="editable-input" 
+                            id="dateLivraison" 
+                            min="2025-09-22"
+                            onchange="saveField('Date livraison souhaitée', this.value)">
+                    </div>
+                    <div class="optional-note">💾 Sauvegarde automatique - Attendez la confirmation</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- SECTION 3 : Activités Connect 2025 -->
+                <div class="info-section">
+                    <h3>🎓 Activités Connect 2025</h3>
                     
-                    <input type="file" id="fileInput" class="file-input" 
-                           accept="image/*,.ai,.pdf,.doc,.docx" multiple onchange="handleFileSelect(event)">
+                    <!-- Atelier -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Atelier (si option prise)
+                        </label>
+                        <div class="optional-note">Uniquement si vous avez souscrit à l'option atelier</div>
+                        <textarea 
+                            class="editable-field" 
+                            id="atelier" 
+                            placeholder="Décrivez la thématique de votre atelier, le contenu, les objectifs, le public cible..."
+                            onblur="saveField('Atelier', this.value)">
+                        </textarea>
+                    </div>
+
+                    <!-- Speed Meeting -->
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Speed Meeting (si option prise)
+                        </label>
+                        <div class="optional-note">Uniquement si vous avez souscrit à l'option speed meeting</div>
+                        <textarea 
+                            class="editable-field" 
+                            id="speedmeeting" 
+                            placeholder="Décrivez votre présentation speed meeting, les points clés à aborder..."
+                            onblur="saveField('Speedmeeting', this.value)">
+                        </textarea>
+                    </div>
+                    <div class="optional-note">💾 Sauvegarde automatique - Attendez la confirmation</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- SECTION 4 : Informations pratiques -->
+                <div class="info-section">
+                    <h3>🍽️ Informations pratiques</h3>
                     
-                    <div class="current-files" id="filesList">
-                        <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
+                    <!-- Régimes alimentaires -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Régimes alimentaires et allergies
+                        </label>
+                        <div class="optional-note">Informations importantes pour l'organisation des repas</div>
+                        <textarea 
+                            class="editable-field" 
+                            id="regimesAllergies" 
+                            placeholder="Ex: Végétarien, végan, sans gluten, allergie aux fruits à coque, intolérance lactose..."
+                            onblur="saveField('Régimes alimentaires et allergies', this.value)">
+                        </textarea>
+                    </div>
+
+                    <!-- NOUVEAU : Tailles t-shirts -->
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
+                            Tailles t-shirts
+                        </label>
+                        <div class="optional-note">Indiquez les tailles de t-shirts pour votre équipe</div>
+                        <textarea 
+                            class="editable-field" 
+                            id="taillesTshirts" 
+                            placeholder="Ex: 2x taille M, 1x taille L, 1x taille XL..."
+                            onblur="saveField('Tailles t-shirts', this.value)">
+                        </textarea>
+                    </div>
+                    <div class="optional-note">💾 Sauvegarde automatique - Attendez la confirmation</div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- SECTION 5 : Documents et logos -->
+                <div class="info-section">
+                    <h3>📁 Documents et logos</h3>
+                    <div class="files-section">
+                        <div class="upload-zone" onclick="document.getElementById('fileInput').click()" 
+                             ondrop="handleDrop(event)" ondragover="allowDrop(event)" ondragleave="removeDragover(event)">
+                            <div class="upload-icon">📁</div>
+                            <p><strong>Cliquez pour sélectionner vos fichiers</strong></p>
+                            <p>Attention : chargez un fichier à la fois pour permettre le traitement.</p>
+                            <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                                Formats acceptés: .ai (vectoriel), PNG CMJN haute définition, PDF, DOC, DOCX (max 10MB)
+                            </p>
+                        </div>
+                        
+                        <input type="file" id="fileInput" class="file-input" 
+                               accept="image/*,.ai,.pdf,.doc,.docx" multiple onchange="handleFileSelect(event)">
+                        
+                        <div class="current-files" id="filesList">
+                            <p style="color: #666; font-style: italic;">Aucun fichier pour le moment</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1365,7 +1477,7 @@
         let sendButton = document.getElementById('sendButton');
         let typingIndicator = document.getElementById('typingIndicator');
         
-        // Boutons d'action avec les nouveaux champs
+        // MODIFIÉ : Boutons d'action avec nouveau champ tailles t-shirts
         function addActionButtons() {
             return `
                 <div class="quick-actions">
@@ -1375,13 +1487,14 @@
                     <button class="quick-btn" onclick="sendQuickMessage('Atelier')">🎓 Atelier</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Speedmeeting')">⚡ Speed Meeting</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Régimes et allergies')">🍽️ Régimes</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Tailles t-shirts')">👕 T-shirts</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Logos')">🎨 Logos</button>
                     <button class="quick-btn" onclick="sendQuickMessage('Contacter équipe')">📧 Contact équipe</button>
                 </div>
             `;
         }
         
-        // NOUVEAU : Fonction pour commenter les actions utilisateur
+        // MODIFIÉ : Fonction pour commenter les actions utilisateur avec nouveau champ
         function commentUserAction(fieldName, value) {
             if (!isExtendedMode || !value || value.trim().length < 10) return;
             
@@ -1392,7 +1505,9 @@
                 'Équipements apportés', 
                 'Date livraison souhaitée',
                 'Atelier',
-                'Speedmeeting'
+                'Speedmeeting',
+                'Régimes alimentaires et allergies',
+                'Tailles t-shirts' // NOUVEAU
             ];
             
             let completedFields = 0;
@@ -1431,6 +1546,9 @@
                 case 'Régimes alimentaires et allergies':
                     comment = `🍽️ Informations alimentaires enregistrées ! ${remaining > 0 ? `Plus que ${remaining} étapes.` : 'Profil 100% complet ! 🎉'}`;
                     break;
+                case 'Tailles t-shirts':
+                    comment = `👕 Tailles t-shirts enregistrées ! ${remaining > 0 ? `Plus que ${remaining} étapes.` : 'Profil 100% complet ! 🎉'}`;
+                    break;
             }
             
             if (comment) {
@@ -1461,7 +1579,7 @@
                 if (result.success) {
                     showSaveIndicator();
                     
-                    // NOUVEAU : Commenter l'action
+                    // Commenter l'action
                     commentUserAction(fieldName, value);
                     
                     // Rafraîchir les données après sauvegarde
@@ -2151,7 +2269,7 @@
             }
         }
         
-        // MODIFIÉ : Détecter les nouveaux types de messages avec gestion contact équipe
+        // MODIFIÉ : Détecter les nouveaux types de messages avec gestion contact équipe et tailles t-shirts
         async function handleRegularMessage(message) {
             // Détecter le type de message selon les boutons cliqués
             if (message === 'Descriptif entreprise') lastBotMessageType = 'descriptif';
@@ -2161,8 +2279,9 @@
             else if (message === 'Speedmeeting') lastBotMessageType = 'speedmeeting';
             else if (message === 'Logos') lastBotMessageType = 'logos';
             else if (message === 'Régimes et allergies') lastBotMessageType = 'regimes'; 
+            else if (message === 'Tailles t-shirts') lastBotMessageType = 'tshirts'; // NOUVEAU
             else if (message === 'Contacter équipe') {
-                // NOUVEAU : Gestion spéciale pour contact équipe
+                // Gestion spéciale pour contact équipe
                 setTimeout(() => {
                     hideTyping();
                     addMessage("📧 Quel message voulez-vous envoyer à l'équipe organisatrice ?\n\nTapez votre message ci-dessous :");
@@ -2173,7 +2292,7 @@
                 return;
             }
             else if (lastBotMessageType === 'contact-pending') {
-                // NOUVEAU : Traitement du message pour l'équipe
+                // Traitement du message pour l'équipe
                 try {
                     const partnerData = currentPartnerData;
                     const response = await fetch(API_URL, {
@@ -2354,7 +2473,7 @@
             chatInputExtended.focus();
         }
         
-        // Afficher les données partenaire avec nouveaux champs éditables
+        // MODIFIÉ : Afficher les données partenaire avec nouveau champ tailles t-shirts
         function displayPartnerData(data) {
             if (!data) return;
             
@@ -2377,6 +2496,7 @@
             document.getElementById('atelier').value = data['Atelier'] || '';
             document.getElementById('speedmeeting').value = data['Speedmeeting'] || '';
             document.getElementById('regimesAllergies').value = data['Régimes alimentaires et allergies'] || '';
+            document.getElementById('taillesTshirts').value = data['Tailles t-shirts'] || ''; // NOUVEAU
             
             // Barre de progression
             const progression = parseInt(data['Progression %']) || 0;
@@ -2411,7 +2531,7 @@
                 if (result.success) {
                     showSaveIndicator();
                     
-                    // NOUVEAU : Commenter l'action
+                    // Commenter l'action
                     commentUserAction('Descriptif entreprise', description);
                 }
                 
@@ -2637,7 +2757,7 @@
             });
         }
         
-        // CORRIGÉ : Afficher les fichiers avec gestion des noms
+        // Afficher les fichiers avec gestion des noms
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
@@ -2647,7 +2767,7 @@
             }
             
             filesList.innerHTML = uploadedFiles.map((file, index) => {
-                // CORRECTION : Gérer les différentes sources de nom de fichier
+                // Gérer les différentes sources de nom de fichier
                 const fileName = file.fileName || file.originalFile?.name || 'Fichier sans nom';
                 const fileSize = file.fileSize || file.originalFile?.size || 0;
                 const logoType = file.logoType || 'Document';
