@@ -27,7 +27,7 @@ export default async function handler(req, res) {
                 return handleGetPartnerData(req, res, otherData);
             case 'upload-file':
                 return handleFileUpload(req, res, otherData);
-            // NOUVEAU : Actions fichiers
+            // Actions fichiers
             case 'get-partner-files':
                 return handleGetPartnerFiles(req, res, otherData);
             case 'download-file':
@@ -48,9 +48,10 @@ export default async function handler(req, res) {
                 return handleDeletePartner(req, res, otherData);
             case 'force-sync':
                 return handleForceSync(req, res);
-            // Actions pour sauvegarder dans des champs spécifiques
+            // Sauvegarde dans champ spécifique
             case 'save-field':
                 return handleSaveField(req, res, otherData);
+            // NOUVEAU : Contact équipe
             case 'contact-team':
                 return handleContactTeam(req, res, otherData);
             default:
@@ -194,7 +195,7 @@ async function callGoogleScript(action, data) {
     }
 }
 
-// OPTIMISÉ : Analyse plus flexible sans mots-clés spécifiques
+// Analyse plus flexible sans mots-clés spécifiques
 async function analyzeAndSaveInfo(message, partnerCode) {
     if (!partnerCode || message.length < 10) return;
     
@@ -655,7 +656,7 @@ async function handleSaveField(req, res, data) {
     }
 }
 
-// Envoyer message à l'équipe
+// NOUVEAU : Envoyer message à l'équipe
 async function handleContactTeam(req, res, data) {
     const { partnerCode, message, contactName, companyName } = data;
     
@@ -683,7 +684,7 @@ async function handleContactTeam(req, res, data) {
         const htmlContent = EMAIL_TEMPLATE.replace('{{content}}', emailContent);
         
         const result = await callGoogleScript('send-email', {
-            to: 'infoconnect@mbefrance.fr',
+            to: 'events@mbefrance.fr',
             subject: `Message partenaire - ${companyName} (${partnerCode})`,
             htmlContent: htmlContent
         });
@@ -709,7 +710,7 @@ async function handleContactTeam(req, res, data) {
     }
 }
 
-// MODIFIÉ : Fonction pour gérer les messages chat avec détection intelligente
+// Fonction pour gérer les messages chat avec détection intelligente
 async function handleChatMessage(req, res, message, conversationId, messageType, otherData) {
     if (!message) {
         return res.status(400).json({ error: 'Message requis' });
@@ -725,7 +726,7 @@ async function handleChatMessage(req, res, message, conversationId, messageType,
     if (isAuthenticated && partnerCode) {
         await analyzeAndSaveInfo(message, partnerCode);
         
-        // MODIFIÉ : Si c'est une réponse à une question spécifique, sauvegarder directement
+        // Si c'est une réponse à une question spécifique, sauvegarder directement
         if (messageType && !['descriptif', 'logos', 'contact'].includes(messageType)) {
             const fieldMapping = {
                 'equipements': 'Équipements apportés',
@@ -734,8 +735,8 @@ async function handleChatMessage(req, res, message, conversationId, messageType,
                 'livraison': 'Date livraison souhaitée',
                 'instructions': 'Instructions livraison spéciales',
                 'connectivite': 'Besoins connectivité additionnels',
-                'atelier': 'Atelier', // NOUVEAU
-                'speedmeeting': 'Speedmeeting' // NOUVEAU
+                'atelier': 'Atelier',
+                'speedmeeting': 'Speedmeeting'
             };
             
             if (fieldMapping[messageType]) {
@@ -744,29 +745,6 @@ async function handleChatMessage(req, res, message, conversationId, messageType,
                     fieldName: fieldMapping[messageType],
                     value: message
                 });
-            }
-        }
-        
-        // Si c'est un message pour l'équipe
-        if (messageType === 'contact') {
-            try {
-                const partnerData = await callGoogleScript('get-partner-data', { codeUnique: partnerCode });
-                if (partnerData.success) {
-                    await handleContactTeam(req, res, {
-                        partnerCode: partnerCode,
-                        message: message,
-                        contactName: partnerData.data['Nom Contact'],
-                        companyName: partnerData.data['Nom Entreprise']
-                    });
-                    
-                    return res.status(200).json({
-                        response: "✅ Votre message a été envoyé à l'équipe organisatrice. Vous recevrez une réponse par email.",
-                        conversationId: conversationId,
-                        status: 'success'
-                    });
-                }
-            } catch (error) {
-                console.error('❌ Erreur envoi message équipe:', error);
             }
         }
     }
@@ -925,7 +903,7 @@ async function handleSaveDescription(req, res, data) {
     }
 }
 
-// NOUVEAU : Récupérer les fichiers d'un partenaire
+// Récupérer les fichiers d'un partenaire
 async function handleGetPartnerFiles(req, res, data) {
     const { codeUnique } = data;
     
@@ -957,7 +935,7 @@ async function handleGetPartnerFiles(req, res, data) {
     }
 }
 
-// NOUVEAU : Télécharger un fichier
+// Télécharger un fichier
 async function handleDownloadFile(req, res, data) {
     const { fileId } = data;
     
@@ -989,7 +967,7 @@ async function handleDownloadFile(req, res, data) {
     }
 }
 
-// NOUVEAU : Supprimer un fichier
+// Supprimer un fichier
 async function handleDeleteFile(req, res, data) {
     const { fileId, codeUnique, logoType } = data;
     
@@ -1023,7 +1001,7 @@ async function handleDeleteFile(req, res, data) {
     }
 }
 
-// MODIFIÉ : Fonction pour gérer l'upload de fichiers avec stockage Drive
+// Fonction pour gérer l'upload de fichiers avec stockage Drive
 async function handleFileUpload(req, res, data) {
     const { fileName, fileSize, contentType, codeUnique, companyName, logoType, fileData } = data;
     
