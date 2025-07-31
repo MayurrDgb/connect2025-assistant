@@ -400,7 +400,7 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
                         Bonjour <strong>${contactName}</strong>,
                     </p>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
-                        Nous sommes ravis d'accueillir <strong>${companyName}</strong> parmi nos partenaires pour l'événement Connect 2025 qui se déroulera du <strong>26 au 28 septembre 2025</strong> au Campus de Cély.
+                        Nous vous remercions pour votre venue et sommes ravis de compter <strong>${companyName}</strong> parmi nos partenaires pour l'événement Connect 2025 qui se déroulera du <strong>26 au 28 septembre 2025</strong> au Campus de Cély.
                     </p>
                     <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px;">
                         Votre code d'accès unique est : <strong style="color: #E2001A; font-size: 18px;">${partnerCode}</strong>
