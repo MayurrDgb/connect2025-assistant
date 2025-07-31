@@ -51,7 +51,7 @@ export default async function handler(req, res) {
             // Sauvegarde dans champ spécifique
             case 'save-field':
                 return handleSaveField(req, res, otherData);
-            // NOUVEAU : Contact équipe
+            // Contact équipe
             case 'contact-team':
                 return handleContactTeam(req, res, otherData);
             default:
@@ -457,43 +457,30 @@ async function sendWelcomeEmail(email, contactName, companyName, partnerCode) {
 
 // Envoyer email personnalisé (admin)
 async function handleSendEmail(req, res, data) {
-    const { recipient, subject, message } = data;
+    const { to, subject, htmlContent } = data;
     
-    console.log('📧 Envoi email à:', recipient);
+    console.log('📧 Envoi email à:', to);
     
     try {
         // Validation
-        if (!recipient || !subject || !message) {
+        if (!to || !subject || !htmlContent) {
             return res.status(400).json({
                 success: false,
                 error: 'Destinataire, objet et message sont requis'
             });
         }
         
-        const recipientData = typeof recipient === 'string' ? JSON.parse(recipient) : recipient;
-        
-        // Créer le contenu HTML
-        const emailContent = `
-            <tr>
-                <td style="padding: 20px 0;">
-                    <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">
-                        Bonjour <strong>${recipientData.name}</strong>,
-                    </p>
-                    <div style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6;">
-                        ${message.replace(/\n/g, '<br>')}
-                    </div>
-                    <p style="font-family: Ubuntu, Verdana, Arial, sans-serif; font-size: 15px; line-height: 1.6; margin-top: 20px;">
-                        Cordialement,<br>
-                        <strong>L'équipe MBE France</strong>
-                    </p>
-                </td>
-            </tr>
-        `;
-        
-        const htmlContent = EMAIL_TEMPLATE.replace('{{content}}', emailContent);
+        // Validation format email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(to)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Format email invalide'
+            });
+        }
         
         const result = await callGoogleScript('send-email', {
-            to: recipientData.email,
+            to: to,
             subject: subject,
             htmlContent: htmlContent
         });
@@ -656,7 +643,7 @@ async function handleSaveField(req, res, data) {
     }
 }
 
-// NOUVEAU : Envoyer message à l'équipe
+// Envoyer message à l'équipe
 async function handleContactTeam(req, res, data) {
     const { partnerCode, message, contactName, companyName } = data;
     
@@ -917,12 +904,12 @@ async function handleGetPartnerFiles(req, res, data) {
         if (result.success) {
             return res.status(200).json({
                 success: true,
-                files: result.files || []
+                data: result.data || []
             });
         } else {
             return res.status(200).json({
                 success: true,
-                files: []
+                data: []
             });
         }
         
@@ -949,7 +936,7 @@ async function handleDownloadFile(req, res, data) {
         if (result.success) {
             return res.status(200).json({
                 success: true,
-                downloadUrl: result.downloadUrl
+                data: result.data
             });
         } else {
             return res.status(404).json({
