@@ -677,6 +677,10 @@
             transform: scale(1.05);
         }
         
+        
+            transform: scale(1.05);
+        }
+        
         .send-button:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -964,16 +968,6 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
-        }
-        
-        .btn-download {
-            background: #E2001A;
-            color: white;
-        }
-        
-        .btn-download:hover {
-            background: #c41e3a;
-            transform: translateY(-2px);
         }
         
         .btn-delete {
@@ -1379,11 +1373,8 @@
                     <div class="avatar">🤖</div>
                     <div class="message-bubble">
                         <p><strong>Bonjour !</strong> Je suis l'assistant de l'équipe organisatrice MBE France pour Connect 2025.</p>
-                        <p>Pour commencer, j'ai besoin de votre <strong>code d'accès unique</strong>.</p>
-                        <div class="quick-actions">
-                            <button class="quick-btn" onclick="sendQuickMessage('J ai mon code')">✅ J'ai mon code</button>
-                            <button class="quick-btn" onclick="sendQuickMessage('Je n ai pas mon code')">❌ Pas de code</button>
-                        </div>
+                        <p>Pour commencer, veuillez saisir votre <strong>code d'accès unique</strong> dans le champ ci-dessous.</p>
+                        <p><em>Si vous n'avez pas votre code, contactez infoconnect@mbefrance.fr</em></p>
                     </div>
                 </div>
             </div>
@@ -1398,7 +1389,7 @@
             
             <div class="chat-input-container">
                 <input type="text" class="chat-input" id="chatInput" 
-                       placeholder="Tapez votre code ou votre message..." maxlength="500">
+                       placeholder="Tapez votre code d'accès..." maxlength="500">
                 <button class="send-button" id="sendButton">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
@@ -1505,11 +1496,11 @@
                         <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
                             Atelier (si option prise)
                         </label>
-                        <div class="optional-note">Uniquement si vous avez souscrit à l'option atelier</div>
+                        <div class="optional-note">Si vous n'avez pas pris cette option, renseignez "AUCUN"</div>
                         <textarea 
                             class="editable-field" 
                             id="atelier" 
-                            placeholder="Décrivez la thématique de votre atelier, le contenu, les objectifs, le public cible..."
+                            placeholder="Décrivez la thématique de votre atelier, le contenu, les objectifs, le public cible... Ou tapez 'AUCUN' si pas d'atelier"
                             onblur="saveFieldOptimized('Atelier', this.value)"
                             oninput="markAsModified(this)">
                         </textarea>
@@ -1519,11 +1510,11 @@
                         <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">
                             Speed Meeting (si option prise)
                         </label>
-                        <div class="optional-note">Uniquement si vous avez souscrit à l'option speed meeting</div>
+                        <div class="optional-note">Si vous n'avez pas pris cette option, renseignez "AUCUN"</div>
                         <textarea 
                             class="editable-field" 
                             id="speedmeeting" 
-                            placeholder="Décrivez votre présentation speed meeting, les points clés à aborder..."
+                            placeholder="Décrivez votre présentation speed meeting, les points clés à aborder... Ou tapez 'AUCUN' si pas de speed meeting"
                             onblur="saveFieldOptimized('Speedmeeting', this.value)"
                             oninput="markAsModified(this)">
                         </textarea>
@@ -1641,6 +1632,9 @@
                 </button>
                 <button class="admin-btn" onclick="forceRefreshData()">
                     <span>🔄</span> Rafraîchir
+                </button>
+                <button class="admin-btn" onclick="setupEmailReminders()">
+                    <span>⏰</span> Config Rappels
                 </button>
             </div>
         </div>
@@ -1811,6 +1805,7 @@
     <div class="save-indicator" id="saveIndicator">
         ✅ Sauvegardé automatiquement
     </div>
+
     <script>
         // Variables globales - CORRECTION : Maintenir l'état d'authentification
         let currentConversationId = null;
@@ -1888,9 +1883,6 @@
                 actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Logos\')">🎨 Logos</button>');
             }
             
-            // SUPPRIMÉ : Plus de bouton contact automatique
-            // Plus de : actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contacter équipe\')">📧 Contact équipe</button>');
-            
             if (actions.length > 0) {
                 return `<div class="quick-actions">${actions.join('')}</div>`;
             }
@@ -1898,14 +1890,14 @@
             return ''; // Pas de boutons si pas de contexte spécifique
         }
         
-        // Commentaires moins fréquents
+        // CORRECTION : Commentaires moins fréquents et plus contextuels
         function commentUserAction(fieldName, value) {
             // Ne commenter que si le mode étendu est actif et que le texte est substantiel
-            if (!isExtendedMode || !value || value.trim().length < 20) return;
+            if (!isExtendedMode || !value || value.trim().length < 30) return;
             
-            // Éviter les commentaires trop fréquents
+            // Éviter les commentaires trop fréquents - augmenter l'intervalle
             const now = Date.now();
-            if (window.lastComment && (now - window.lastComment) < 10000) return; // Max 1 fois par 10s
+            if (window.lastComment && (now - window.lastComment) < 30000) return; // Max 1 fois par 30s
             window.lastComment = now;
             
             // Calculer la progression actuelle
@@ -1932,27 +1924,21 @@
                 completedFields++;
             }
             
-            const progression = Math.round((completedFields / fieldsToCheck.length) * 100);
             const remaining = fieldsToCheck.length - completedFields;
             
             let comment = '';
             
-            // Commentaires plus courts et moins intrusifs
-            if (progression >= 100) {
-                comment = '🎉 Profil 100% complet ! Excellent travail.';
-            } else if (progression >= 75) {
-                comment = `✅ Super ! Plus que ${remaining} étape${remaining > 1 ? 's' : ''} pour finaliser.`;
-            } else if (progression >= 50) {
-                comment = `👍 Bien ! Il reste ${remaining} informations à compléter.`;
-            } else {
-                // Pas de commentaire si moins de 50% pour éviter le spam
-                return;
+            // Commentaires plus rares et contextuels
+            if (remaining === 0) {
+                comment = '🎉 Profil 100% complet ! Excellent travail. Modifiable jusqu\'au 1er septembre.';
+            } else if (remaining <= 2 && Math.random() < 0.3) { // 30% de chance seulement
+                comment = `Plus que ${remaining} étape${remaining > 1 ? 's' : ''} pour finaliser !`;
             }
             
             if (comment) {
                 setTimeout(() => {
                     addMessage(comment);
-                }, 2000); // Délai réduit
+                }, 3000);
             }
         }
         
@@ -2089,6 +2075,38 @@
             }, delay);
         }
         
+        // CORRECTION : Fonction pour vérifier et afficher le message de profil complété
+        function checkAndShowCompletionMessage() {
+            if (!currentPartnerData) return;
+            
+            const fieldsToCheck = [
+                'Descriptif entreprise',
+                'Équipements apportés', 
+                'Date livraison souhaitée',
+                'Atelier',
+                'Speedmeeting',
+                'Régimes alimentaires et allergies',
+                'Tailles t-shirts'
+            ];
+            
+            let completedFields = 0;
+            fieldsToCheck.forEach(field => {
+                if (currentPartnerData[field] && currentPartnerData[field].toString().trim() !== '') {
+                    completedFields++;
+                }
+            });
+            
+            // Vérifier aussi les logos
+            const hasLogos = (currentPartnerData['Logo CMJN'] && currentPartnerData['Logo CMJN'].toString().trim() !== '') ||
+                             (currentPartnerData['Logo Négatif'] && currentPartnerData['Logo Négatif'].toString().trim() !== '');
+            
+            if (completedFields === fieldsToCheck.length && hasLogos) {
+                setTimeout(() => {
+                    addMessage('🎉 **Profil complété avec tous les éléments, merci !** Vos informations restent modifiables jusqu\'au 1er septembre via cette interface.');
+                }, 2000);
+            }
+        }
+        
         // Fonctions pour le chat mobile
         function toggleMobileChat() {
             const modal = document.getElementById('mobileChatModal');
@@ -2100,6 +2118,7 @@
                 openMobileChat();
             }
         }
+
         function openMobileChat() {
             const modal = document.getElementById('mobileChatModal');
             const btn = document.getElementById('floatingChatBtn');
@@ -2122,6 +2141,7 @@
                 mobileChatMessages.scrollTop = mobileChatMessages.scrollHeight;
             }, 100);
         }
+
         function closeMobileChat() {
             const modal = document.getElementById('mobileChatModal');
             const btn = document.getElementById('floatingChatBtn');
@@ -2129,6 +2149,7 @@
             modal.classList.remove('show');
             btn.classList.remove('active');
         }
+
         function setupMobileChatEvents() {
             const input = document.getElementById('mobileChatInput');
             const sendBtn = document.getElementById('mobileChatSend');
@@ -2152,6 +2173,7 @@
                 }
             });
         }
+
         function sendMobileMessage() {
             const input = document.getElementById('mobileChatInput');
             const message = input.value.trim();
@@ -2171,10 +2193,12 @@
                 closeMobileChat();
             }, 500);
         }
+
         // Détecter si on est sur mobile
         function isMobile() {
             return window.innerWidth <= 768;
         }
+
         // Adapter l'interface selon la taille d'écran
         function adaptInterface() {
             if (isMobile() && isExtendedMode) {
@@ -2185,6 +2209,7 @@
                 document.getElementById('floatingChatBtn').style.display = 'none';
             }
         }
+
         // Écouter les changements de taille d'écran
         window.addEventListener('resize', adaptInterface);
         // Adapter l'interface au chargement
@@ -2677,6 +2702,32 @@
             }
         }
         
+        // NOUVEAU : Configurer les rappels email automatiques
+        async function setupEmailReminders() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'setup-email-reminders'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSaveIndicator('✅ Rappels configurés !');
+                    alert('Rappels email automatiques configurés (tous les 5 jours)');
+                } else {
+                    alert('Erreur: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur configuration rappels:', error);
+                alert('Erreur technique lors de la configuration');
+            }
+        }
+        
         // Mettre à jour la liste des destinataires email
         function updateEmailRecipients() {
             const select = document.getElementById('emailRecipient');
@@ -3066,6 +3117,9 @@ L'équipe vous répondra dans les plus brefs délais !`);
                         // Mise à jour seulement des éléments qui ont changé
                         updateProgressionOnly(result.data);
                         
+                        // CORRECTION : Vérifier le profil complété après rafraîchissement
+                        checkAndShowCompletionMessage();
+                        
                         window.lastDataString = dataString;
                         console.log('🔄 Progression mise à jour');
                     }
@@ -3382,9 +3436,9 @@ L'équipe vous répondra dans les plus brefs délais !`);
             }
         }
         
-        // Détecter le type de logo
+        // CORRECTION : Détecter le type de logo avec casse insensible et accents
         function detectLogoType(fileName) {
-            const name = fileName.toLowerCase();
+            const name = fileName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Enlever accents
             
             if (name.includes('cmjn') || name.includes('cmyk') || name.includes('couleur') || name.includes('color')) {
                 return 'CMJN';
@@ -3392,7 +3446,6 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 return 'Négatif';
             }
             
-            // Si pas de détection automatique, demander à l'utilisateur
             return null;
         }
         
@@ -3408,7 +3461,18 @@ L'équipe vous répondra dans les plus brefs délais !`);
                     // Demander à l'utilisateur
                     logoType = prompt(`Quel type de logo est "${file.name}" ?\n\n1. Tapez "CMJN" pour logo couleur\n2. Tapez "Négatif" pour logo fond sombre\n\nVotre choix :`);
                     
-                    if (!logoType || !['CMJN', 'Négatif'].includes(logoType)) {
+                    if (!logoType) {
+                        alert('Type de logo non valide. Upload annulé.');
+                        return;
+                    }
+                    
+                    // CORRECTION : Normaliser la réponse utilisateur
+                    logoType = logoType.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    if (logoType.includes('cmjn') || logoType.includes('cmyk') || logoType.includes('couleur')) {
+                        logoType = 'CMJN';
+                    } else if (logoType.includes('negatif') || logoType.includes('négatif') || logoType.includes('blanc')) {
+                        logoType = 'Négatif';
+                    } else {
                         alert('Type de logo non valide. Upload annulé.');
                         return;
                     }
@@ -3467,7 +3531,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
             });
         }
         
-        // Afficher les fichiers avec gestion des noms
+        // CORRECTION : Afficher les fichiers SANS bouton télécharger
         function updateFilesList() {
             const filesList = document.getElementById('filesList');
             
@@ -3491,9 +3555,6 @@ L'équipe vous répondra dans les plus brefs délais !`);
                             <div class="file-type">${logoType}</div>
                         </div>
                         <div class="file-actions">
-                            <button class="btn-small btn-download" onclick="downloadFile('${fileId}')">
-                                📥 Télécharger
-                            </button>
                             <button class="btn-small btn-delete" onclick="deleteFile(${index})">
                                 🗑️ Supprimer
                             </button>
@@ -3509,33 +3570,6 @@ L'équipe vous répondra dans les plus brefs délais !`);
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        // Télécharger depuis Drive
-        async function downloadFile(fileId) {
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'download-file',
-                        fileId: fileId
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success && result.data && result.data.downloadUrl) {
-                    // Ouvrir le lien de téléchargement
-                    window.open(result.data.downloadUrl, '_blank');
-                } else {
-                    alert('Erreur lors du téléchargement');
-                }
-                
-            } catch (error) {
-                console.error('Erreur téléchargement:', error);
-                alert('Erreur lors du téléchargement');
-            }
         }
         
         // Supprimer fichier du Drive et du Sheet
