@@ -1891,7 +1891,7 @@
         }
         
         // CORRECTION : Commentaires moins fréquents et plus contextuels
-        function commentUserAction(fieldName, value) {
+        //function commentUserAction(fieldName, value) {
             // Ne commenter que si le mode étendu est actif et que le texte est substantiel
             if (!isExtendedMode || !value || value.trim().length < 30) return;
             
@@ -2076,7 +2076,7 @@
         }
         
         // CORRECTION : Fonction pour vérifier et afficher le message de profil complété
-        function checkAndShowCompletionMessage() {
+        // function checkAndShowCompletionMessage() {
             if (!currentPartnerData) return;
             
             const fieldsToCheck = [
