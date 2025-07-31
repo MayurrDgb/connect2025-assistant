@@ -1124,10 +1124,117 @@
             padding: 5px;
         }
         
-        /* Responsive amélioré */
+        /* CORRECTIONS MOBILE ADMIN - NOUVELLES RÈGLES */
         @media (max-width: 768px) {
             body { 
                 padding: 10px; 
+            }
+            
+            /* Interface admin responsive */
+            .admin-container.show {
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .admin-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .admin-title {
+                font-size: 20px;
+                text-align: center;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-btn {
+                justify-content: center;
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            /* Stats grid mobile */
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            /* Tableau partenaires mobile */
+            .partners-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 15px 20px;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-top: 0;
+            }
+            
+            .partners-table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .partners-table thead,
+            .partners-table tbody,
+            .partners-table th,
+            .partners-table td,
+            .partners-table tr {
+                display: block;
+            }
+            
+            .partners-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            .partners-table tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                background: white;
+            }
+            
+            .partners-table td {
+                border: none;
+                position: relative;
+                padding: 8px 8px 8px 30%;
+                text-align: left;
+            }
+            
+            .partners-table td:before {
+                content: attr(data-label) ": ";
+                position: absolute;
+                left: 6px;
+                width: 25%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #333;
             }
             
             /* Masquer l'interface double sur mobile */
@@ -1199,53 +1306,34 @@
                 font-size: 36px;
             }
             
-            /* Optimiser les stats admin sur mobile */
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .admin-actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .admin-btn {
-                justify-content: center;
-                padding: 12px 16px;
-            }
-            
             /* Optimiser les modals sur mobile */
             .modal-content {
                 width: 95%;
                 max-width: none;
                 margin: 10px;
             }
-            
-            /* Optimiser le tableau partenaires sur mobile */
-            .partners-table {
-                font-size: 12px;
-            }
-            
-            .partners-table th,
-            .partners-table td {
-                padding: 8px 5px;
-            }
-            
-            .search-box {
-                width: 100%;
-                margin-top: 10px;
-            }
-            
-            .partners-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
         }
         
         /* Très petits écrans */
         @media (max-width: 480px) {
+            .admin-content {
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .partners-table td {
+                padding: 6px 6px 6px 35%;
+                font-size: 11px;
+            }
+            
+            .partners-table td:before {
+                width: 30%;
+                font-size: 10px;
+            }
+            
             .company-header {
                 padding: 15px;
             }
@@ -1765,12 +1853,12 @@
             `;
         }
         
-        // Boutons contextuels selon le contenu
+        // CORRECTION : Boutons contextuels selon le contenu SANS bouton contact automatique
         function addContextualActions(content) {
             const actions = [];
             const lowerContent = content.toLowerCase();
             
-            // Boutons selon le contexte du message
+            // Boutons selon le contexte du message SEULEMENT
             if (lowerContent.includes('descriptif') || lowerContent.includes('entreprise')) {
                 actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Descriptif entreprise\')">📝 Descriptif</button>');
             }
@@ -1800,16 +1888,14 @@
                 actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Logos\')">🎨 Logos</button>');
             }
             
-            // Toujours proposer le contact équipe si il y a d'autres boutons
-            if (actions.length > 0) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contacter équipe\')">📧 Contact équipe</button>');
-            }
+            // SUPPRIMÉ : Plus de bouton contact automatique
+            // Plus de : actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Contacter équipe\')">📧 Contact équipe</button>');
             
             if (actions.length > 0) {
                 return `<div class="quick-actions">${actions.join('')}</div>`;
             }
             
-            return '';
+            return ''; // Pas de boutons si pas de contexte spécifique
         }
         
         // Commentaires moins fréquents
@@ -2484,7 +2570,7 @@
             document.getElementById('incompleteProgress').textContent = `${incompletePercent}%`;
         }
         
-        // Mettre à jour le tableau des partenaires avec bouton supprimer
+        // CORRECTION : Mettre à jour le tableau des partenaires avec data-label pour mobile
         function updatePartnersTable() {
             const tbody = document.getElementById('partnersTableBody');
             tbody.innerHTML = '';
@@ -2508,21 +2594,22 @@
                 const lastMod = partner['Dernière modification'] ? 
                     new Date(partner['Dernière modification']).toLocaleDateString('fr-FR') : '-';
                 
+                // CORRECTION : Ajouter data-label pour le responsive mobile
                 row.innerHTML = `
-                    <td><strong>${partner['Code Unique']}</strong></td>
-                    <td>${partner['Nom Entreprise'] || '-'}</td>
-                    <td>${partner['Nom Contact'] || '-'}</td>
-                    <td>${partner['Email Contact'] || '-'}</td>
-                    <td><span class="status-badge ${statusClass}">${status}</span></td>
-                    <td>
+                    <td data-label="Code"><strong>${partner['Code Unique']}</strong></td>
+                    <td data-label="Entreprise">${partner['Nom Entreprise'] || '-'}</td>
+                    <td data-label="Contact">${partner['Nom Contact'] || '-'}</td>
+                    <td data-label="Email">${partner['Email Contact'] || '-'}</td>
+                    <td data-label="Statut"><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td data-label="Progression">
                         <div class="progress-bar-small">
                             <div class="progress-fill-small" style="width: ${progression}%"></div>
                         </div>
                         <small>${progression}%</small>
                     </td>
-                    <td class="${deadlineInfo.className}">${deadlineInfo.formatted}</td>
-                    <td>${lastMod}</td>
-                    <td>
+                    <td data-label="Deadline" class="${deadlineInfo.className}">${deadlineInfo.formatted}</td>
+                    <td data-label="Modifié">${lastMod}</td>
+                    <td data-label="Actions">
                         <button class="btn-small btn-delete" onclick="confirmDeletePartner('${partner['Code Unique']}', '${partner['Nom Entreprise']}')">
                             🗑️ Supprimer
                         </button>
