@@ -1850,55 +1850,21 @@
         
         // CORRECTION : Boutons contextuels selon le contenu SANS bouton contact automatique
         function addContextualActions(content) {
-            const actions = [];
-            const lowerContent = content.toLowerCase();
-            
-            // Boutons selon le contexte du message SEULEMENT
-            if (lowerContent.includes('descriptif') || lowerContent.includes('entreprise')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Descriptif entreprise\')">📝 Descriptif</button>');
-            }
-            
-            if (lowerContent.includes('équipement') || lowerContent.includes('matériel') || lowerContent.includes('livraison')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Équipements apportés\')">📦 Équipements</button>');
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Date livraison\')">📅 Livraison</button>');
-            }
-            
-            if (lowerContent.includes('atelier')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Atelier\')">🎓 Atelier</button>');
-            }
-            
-            if (lowerContent.includes('speed') || lowerContent.includes('meeting')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Speedmeeting\')">⚡ Speed Meeting</button>');
-            }
-            
-            if (lowerContent.includes('régime') || lowerContent.includes('allergie') || lowerContent.includes('alimentaire')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Régimes et allergies\')">🍽️ Régimes</button>');
-            }
-            
-            if (lowerContent.includes('taille') || lowerContent.includes('t-shirt') || lowerContent.includes('tshirt')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Tailles t-shirts\')">👕 T-shirts</button>');
-            }
-            
-            if (lowerContent.includes('logo') || lowerContent.includes('fichier') || lowerContent.includes('document')) {
-                actions.push('<button class="quick-btn" onclick="sendQuickMessage(\'Logos\')">🎨 Logos</button>');
-            }
-            
-            if (actions.length > 0) {
-                return `<div class="quick-actions">${actions.join('')}</div>`;
-            }
-            
-            return ''; // Pas de boutons si pas de contexte spécifique
+            // DÉSACTIVÉ - Plus de boutons automatiques
+            return '';
         }
         
         // CORRECTION : Commentaires moins fréquents et plus contextuels
-        //function commentUserAction(fieldName, value) {
-            // Ne commenter que si le mode étendu est actif et que le texte est substantiel
-            if (!isExtendedMode || !value || value.trim().length < 30) return;
+        function commentUserAction(fieldName, value) {
+            // Ne commenter QUE si c'est vraiment la fin ET pas déjà fait
+            if (!isExtendedMode || !value || value.trim().length < 50) return;
             
-            // Éviter les commentaires trop fréquents - augmenter l'intervalle
+            // Éviter les commentaires trop fréquents - MAX 1 fois par minute
             const now = Date.now();
-            if (window.lastComment && (now - window.lastComment) < 30000) return; // Max 1 fois par 30s
-            window.lastComment = now;
+            if (window.lastComment && (now - window.lastComment) < 60000) return; // 60 secondes
+            
+            // SEULEMENT si c'est vraiment 100% complet ET première fois
+            if (window.completionMessageShown) return; // Déjà montré
             
             // Calculer la progression actuelle
             const currentData = currentPartnerData || {};
@@ -1914,30 +1880,22 @@
             
             let completedFields = 0;
             fieldsToCheck.forEach(field => {
-                if (currentData[field] && currentData[field].toString().trim() !== '') {
+                if (currentData[field] && currentData[field].toString().trim() !== '' && currentData[field].toString().trim() !== 'AUCUN') {
                     completedFields++;
                 }
             });
             
-            // Ajouter le champ qui vient d'être rempli s'il n'était pas déjà compté
-            if (!currentData[fieldName] || currentData[fieldName].toString().trim() === '') {
-                completedFields++;
-            }
+            // Vérifier aussi les logos
+            const hasLogos = (currentData['Logo CMJN'] && currentData['Logo CMJN'].toString().trim() !== '') ||
+                             (currentData['Logo Négatif'] && currentData['Logo Négatif'].toString().trim() !== '');
             
-            const remaining = fieldsToCheck.length - completedFields;
-            
-            let comment = '';
-            
-            // Commentaires plus rares et contextuels
-            if (remaining === 0) {
-                comment = '🎉 Profil 100% complet ! Excellent travail. Modifiable jusqu\'au 1er septembre.';
-            } else if (remaining <= 2 && Math.random() < 0.3) { // 30% de chance seulement
-                comment = `Plus que ${remaining} étape${remaining > 1 ? 's' : ''} pour finaliser !`;
-            }
-            
-            if (comment) {
+            // SEULEMENT si 100% complet ET pas déjà montré
+            if (completedFields === fieldsToCheck.length && hasLogos && !window.completionMessageShown) {
+                window.lastComment = now;
+                window.completionMessageShown = true; // Marquer comme montré
+                
                 setTimeout(() => {
-                    addMessage(comment);
+                    addMessage('🎉 Profil 100% complet ! Modifiable jusqu\'au 1er septembre.');
                 }, 3000);
             }
         }
@@ -2075,36 +2033,11 @@
             }, delay);
         }
         
-        // CORRECTION : Fonction pour vérifier et afficher le message de profil complété
-        // function checkAndShowCompletionMessage() {
-            if (!currentPartnerData) return;
-            
-            const fieldsToCheck = [
-                'Descriptif entreprise',
-                'Équipements apportés', 
-                'Date livraison souhaitée',
-                'Atelier',
-                'Speedmeeting',
-                'Régimes alimentaires et allergies',
-                'Tailles t-shirts'
-            ];
-            
-            let completedFields = 0;
-            fieldsToCheck.forEach(field => {
-                if (currentPartnerData[field] && currentPartnerData[field].toString().trim() !== '') {
-                    completedFields++;
-                }
-            });
-            
-            // Vérifier aussi les logos
-            const hasLogos = (currentPartnerData['Logo CMJN'] && currentPartnerData['Logo CMJN'].toString().trim() !== '') ||
-                             (currentPartnerData['Logo Négatif'] && currentPartnerData['Logo Négatif'].toString().trim() !== '');
-            
-            if (completedFields === fieldsToCheck.length && hasLogos) {
-                setTimeout(() => {
-                    addMessage('🎉 **Profil complété avec tous les éléments, merci !** Vos informations restent modifiables jusqu\'au 1er septembre via cette interface.');
-                }, 2000);
-            }
+        // CORRECTION : Fonction désactivée pour éviter les répétitions
+        function checkAndShowCompletionMessage() {
+            // DÉSACTIVÉ - Message trop répétitif
+            console.log('Message de completion désactivé pour éviter les répétitions');
+            return;
         }
         
         // Fonctions pour le chat mobile
@@ -3165,8 +3098,7 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 <div class="avatar">🤖</div>
                 <div class="message-bubble">
                     <p><strong>Bienvenue dans votre espace partenaire !</strong></p>
-                    <p>Vous pouvez maintenant modifier directement vos informations dans le panneau${isMobile() ? '. Utilisez le bouton 💬 pour me parler.' : ' de gauche ou me poser des questions.'}</p>
-                    ${!isMobile() ? '<p>Que souhaitez-vous faire maintenant ?</p>' + addActionButtons() : ''}
+                    <p>Modifiez vos informations dans le panneau${isMobile() ? '. Utilisez le bouton 💬 pour me parler.' : ' de gauche ou posez-moi des questions.'}</p>
                 </div>
             `;
             chatMessagesExtended.appendChild(welcomeMessage);
@@ -3302,22 +3234,15 @@ L'équipe vous répondra dans les plus brefs délais !`);
                 let quickActions = '';
                 
                 if (isAuthenticated && isExtendedMode) {
-                    // Afficher les boutons seulement si :
-                    // 1. Le message contient "que souhaitez-vous faire"
-                    // 2. C'est un message de bienvenue
-                    // 3. Le message demande une action spécifique
+                    // CORRECTION : Boutons SEULEMENT dans des cas très spécifiques
                     if (content.toLowerCase().includes('que souhaitez-vous faire') || 
-                        content.toLowerCase().includes('bienvenue') ||
-                        content.toLowerCase().includes('choisissez une action') ||
-                        content.toLowerCase().includes('comment puis-je vous aider')) {
+                        (content.toLowerCase().includes('bienvenue') && !window.welcomeButtonsShown)) {
                         quickActions = addActionButtons();
-                    } else {
-                        // Sinon, boutons contextuels seulement
-                        quickActions = addContextualActions(content);
+                        if (content.toLowerCase().includes('bienvenue')) {
+                            window.welcomeButtonsShown = true; // Ne plus les montrer après bienvenue
+                        }
                     }
-                } else {
-                    // Mode non authentifié : boutons contextuels seulement
-                    quickActions = addQuickActions(content);
+                    // Plus de boutons contextuels automatiques
                 }
                 
                 messageDiv.innerHTML = `
